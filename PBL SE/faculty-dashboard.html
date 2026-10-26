@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Portal - GM University Attendance System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/gmu-crest.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Bar (Matching gmu.ac.in screenshot) -->
+  <aside class="top-bar-official" aria-label="Official University Contact & KCET Codes">
+    <div class="container">
+      <div class="top-contact-info">
+        <span><i>📞</i> 8192233344</span>
+        <span class="divider">|</span>
+        <span><i>✉</i> info@gmu.ac.in</span>
+        <span class="divider">|</span>
+        <span><i>📍</i> Department of Computer Science & Engineering</span>
+      </div>
+      <div class="top-right-bar">
+        <div class="top-kcet-codes">
+          KCET Codes : B.Tech – E303 &nbsp;|&nbsp; MCA – C568 &nbsp;|&nbsp; MBA – B086
+        </div>
+        <span id="liveClock" style="font-family: monospace; font-weight: 700; color: #20060B;"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="main-header-gmu">
+    <div class="container header-flex-wrapper">
+      <div class="brand-anchor" title="GM University - Innovating Minds">
+        <img src="assets/gmu-official-logo.png" alt="GM University Logo" style="height: 58px; width: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.35rem; font-weight: 900; color: #F8D272; letter-spacing: 1px; line-height: 1.1;">
+            GM UNIVERSITY
+          </div>
+          <div style="font-family: 'Brush Script MT', cursive, Georgia, serif; font-size: 0.9rem; color: #FFFFFF; font-style: italic;">
+            Innovating Minds
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="color: var(--gmu-gold); font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
+          Faculty Attendance Register
+        </div>
+        <div style="font-size: 0.75rem; color: #FDF3D5;">
+          Faculty of Engineering & Technology (FET)
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar with Tabs -->
+  <nav class="portal-navbar">
+    <div class="container">
+      <button class="mobile-nav-toggle" onclick="toggleNav()">☰</button>
+      <ul class="nav-links" id="facultyNavLinks">
+        <li><button type="button" class="nav-tab-btn active" data-tab="tab-mark" onclick="switchFacultyTab('tab-mark')"><i>📝</i> Mark Daily Attendance</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-history" onclick="switchFacultyTab('tab-history')"><i>📜</i> Attendance History</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-roster" onclick="switchFacultyTab('tab-roster')"><i>👥</i> Class Roster & 75% Check</button></li>
+      </ul>
+      <div class="user-session-widget" id="user-session-container">
+        <!-- Rendered by auth.js -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Faculty Banner -->
+      <section class="dashboard-banner">
+        <div>
+          <h1 id="facultyGreeting">Welcome, Faculty Member</h1>
+          <p id="facultyMeta">Department of Computer Science & Engineering • Academic Year 2026-27</p>
+        </div>
+        <div class="dashboard-actions">
+          <button class="btn btn-gold" onclick="switchFacultyTab('tab-mark')"><i>📝</i> Take Attendance</button>
+          <button class="btn btn-secondary" onclick="exportFacultyHistoryCSV()"><i>📥</i> Export CSV</button>
+        </div>
+      </section>
+
+      <!-- Faculty Authorized Department Switcher (Shown if assigned to multiple departments) -->
+      <div id="facultyDeptSwitcherBar" class="content-card" style="margin-bottom: 20px; padding: 14px 20px; display: none; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-left: 5px solid var(--gmu-gold);">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <label for="facultyDeptSelector" style="font-weight: 800; color: var(--gmu-primary); display: flex; align-items: center; gap: 6px; font-size: 0.95rem; margin: 0;">
+            <span>🏢</span> Active Department Context:
+          </label>
+          <select id="facultyDeptSelector" class="form-control" style="font-weight: 700; width: auto; min-width: 280px; border: 2px solid var(--gmu-gold);" onchange="onFacultyDeptChanged(this.value)">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="meta-pill" style="background: var(--gmu-primary); color: #fff; font-weight: 700;" id="facultyDeptScopePill">Department</span>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 1: MARK DAILY ATTENDANCE
+           =================================================================== -->
+      <div id="tab-mark" class="faculty-tab-pane active">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>📝</i> Record Daily Lecture Attendance</h3>
+            <span style="font-size: 0.8rem; color: var(--gmu-text-muted);">Step 1: Select Session &rarr; Step 2: Mark Students &rarr; Step 3: Save</span>
+          </div>
+
+          <div class="content-card-body">
+            
+            <!-- Session Parameters Bar -->
+            <div class="filter-bar" style="background: #FFFDF9; border: 1.5px solid var(--gmu-gold);">
+              <div class="filter-group">
+                <label for="attClassSelect">Class / Section <span class="req">*</span></label>
+                <select id="attClassSelect" class="form-control" onchange="loadStudentsForMarking()">
+                  <option value="CSE-A">CSE-A (4th Sem)</option>
+                  <option value="CSE-B">CSE-B (4th Sem)</option>
+                  <option value="ISE-A">ISE-A (4th Sem)</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="attSubjectSelect">Subject / Course <span class="req">*</span></label>
+                <select id="attSubjectSelect" class="form-control">
+                  <option value="Software Engineering" data-code="CS401">Software Engineering (CS401)</option>
+                  <option value="Database Management Systems" data-code="CS402">Database Management Systems (CS402)</option>
+                  <option value="Operating Systems" data-code="CS403">Operating Systems (CS403)</option>
+                  <option value="Design & Analysis of Algorithms" data-code="CS404">Design & Analysis of Algorithms (CS404)</option>
+                  <option value="Full Stack Development" data-code="IS401">Full Stack Development (IS401)</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="attDateSelect">Lecture Date <span class="req">*</span></label>
+                <input type="date" id="attDateSelect" class="form-control" onchange="checkExistingSessionNotice()">
+              </div>
+            </div>
+
+            <!-- Notice if session already exists for this date -->
+            <div id="duplicateSessionNotice" style="display: none; background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 12px 16px; margin-bottom: 16px; border-radius: 4px; font-size: 0.85rem; color: #92400E;">
+              ⚠ <strong>Notice:</strong> An attendance record already exists for this Class, Subject, and Date. Submitting will update/overwrite the existing record.
+            </div>
+
+            <!-- Quick Shortcuts Bar -->
+            <div class="marking-controls-bar">
+              <div>
+                <strong>Students in Class:</strong> <span id="markingCount">0</span>
+                <span style="margin: 0 8px; color: var(--gmu-border);">|</span>
+                <span style="color: var(--gmu-success); font-weight: 700;">Present: <span id="summaryPresentCount">0</span></span>
+                <span style="margin: 0 6px; color: var(--gmu-border);">|</span>
+                <span style="color: var(--gmu-danger); font-weight: 700;">Absent: <span id="summaryAbsentCount">0</span></span>
+              </div>
+
+              <div class="marking-actions">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="markAllStatus('Present')">
+                  ✓ Mark All Present
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="markAllStatus('Absent')">
+                  ✕ Mark All Absent
+                </button>
+              </div>
+            </div>
+
+            <!-- Students List / Grid -->
+            <div id="markingStudentList" class="attendance-sheet-grid">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Submit Attendance -->
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid var(--gmu-border); padding-top: 16px;">
+              <button type="button" class="btn btn-secondary" onclick="loadStudentsForMarking()">
+                Reset Form
+              </button>
+              <button type="button" class="btn btn-primary" style="padding: 12px 28px; font-size: 1rem;" onclick="submitAttendanceSession()">
+                💾 Save & Submit Attendance
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 2: ATTENDANCE HISTORY
+           =================================================================== -->
+      <div id="tab-history" class="faculty-tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>📜</i> Lecture Attendance History & Sessions</h3>
+            <button class="btn btn-gold btn-sm" onclick="exportFacultyHistoryCSV()"><i>📥</i> Download CSV</button>
+          </div>
+
+          <div class="content-card-body">
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="histClassFilter">Class / Section</label>
+                <select id="histClassFilter" class="form-control" onchange="renderFacultyHistory()">
+                  <option value="ALL">All My Classes</option>
+                  <option value="CSE-A">CSE-A</option>
+                  <option value="CSE-B">CSE-B</option>
+                  <option value="ISE-A">ISE-A</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="histSubjectFilter">Subject</label>
+                <select id="histSubjectFilter" class="form-control" onchange="renderFacultyHistory()">
+                  <option value="ALL">All Subjects</option>
+                  <option value="Software Engineering">Software Engineering</option>
+                  <option value="Database Management Systems">Database Management Systems</option>
+                  <option value="Operating Systems">Operating Systems</option>
+                  <option value="Design & Analysis of Algorithms">Design & Analysis of Algorithms</option>
+                  <option value="Full Stack Development">Full Stack Development</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="histDateFilter">Specific Date</label>
+                <input type="date" id="histDateFilter" class="form-control" onchange="renderFacultyHistory()">
+              </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Recorded By</th>
+                    <th>Turnout (Present / Total)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="facultyHistoryTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 3: CLASS ROSTER & LOW ATTENDANCE
+           =================================================================== -->
+      <div id="tab-roster" class="faculty-tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>👥</i> Student Performance & Attendance Compliance</h3>
+            <button class="btn btn-secondary btn-sm" onclick="printRoster()"><i>🖨</i> Print Roster</button>
+          </div>
+
+          <div class="content-card-body">
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="rosterClassFilter">Select Class</label>
+                <select id="rosterClassFilter" class="form-control" onchange="renderFacultyRoster()">
+                  <option value="CSE-A">CSE-A</option>
+                  <option value="CSE-B">CSE-B</option>
+                  <option value="ISE-A">ISE-A</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="rosterSearch">Search Student</label>
+                <input type="text" id="rosterSearch" class="form-control" placeholder="Search by name or USN..." oninput="renderFacultyRoster()">
+              </div>
+
+              <div class="filter-group" style="justify-content: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="rosterOnlyLow" onchange="renderFacultyRoster()">
+                  <span style="color: var(--gmu-danger); font-weight: 700;">Highlight Only &lt; 75% Defaulters</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Roster Table -->
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>USN</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Total Classes</th>
+                    <th>Attended</th>
+                    <th>Overall %</th>
+                    <th>UGC Compliance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="facultyRosterTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Session Details Modal -->
+  <div class="modal-overlay" id="modalSessionDetails">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalSessionTitle">Attendance Session Details</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalSessionDetails')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalSessionMeta" style="background: var(--gmu-surface-alt); padding: 12px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 0.88rem;"></div>
+        <div class="table-responsive">
+          <table class="gmu-table">
+            <thead>
+              <tr>
+                <th>USN</th>
+                <th>Student Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="modalSessionTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modalSessionDetails')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official University Footer -->
+  <footer class="main-footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <div>Copyright &copy; 2026 <strong>GM University, Davanagere</strong>. All Rights Reserved.</div>
+        <div>Faculty Portal • Student Attendance Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/departments.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/faculty.js"></script>
+  <script src="js/attendance.js"></script>
+
+  <script>
+    let currentFaculty = null;
+    let facultyProfile = null;
+    let activeDeptId = null;
+    let activeDept = null;
+    let currentMarkingState = {}; // { usn: 'Present' | 'Absent' }
+    let cachedFacultySessions = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      currentFaculty = Auth.requireAuth(['faculty', 'admin']);
+      if (!currentFaculty) return;
+
+      const allFaculty = StorageManager.getFaculty();
+      facultyProfile = allFaculty.find(f => (currentFaculty.facultyId && f.facultyId === currentFaculty.facultyId) || (currentFaculty.email && f.email === currentFaculty.email)) || currentFaculty;
+
+      initFacultyDepartments();
+      startLiveClock();
+    });
+
+    function startLiveClock() {
+      const clock = document.getElementById('liveClock');
+      function update() {
+        if (clock) clock.textContent = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString();
+      }
+      setInterval(update, 1000);
+      update();
+    }
+
+    function toggleNav() {
+      const links = document.getElementById('facultyNavLinks');
+      links.classList.toggle('open');
+    }
+
+    function switchFacultyTab(tabId) {
+      document.querySelectorAll('.faculty-tab-pane').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.style.display = 'block';
+
+      const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const links = document.getElementById('facultyNavLinks');
+      if (links) links.classList.remove('open');
+    }
+
+    // Initialize Authorized Departments
+    function initFacultyDepartments() {
+      const allDepts = DepartmentsManager.getDepartments();
+      const authDeptIds = facultyProfile.authorizedDepartments && facultyProfile.authorizedDepartments.length > 0
+        ? facultyProfile.authorizedDepartments
+        : [facultyProfile.departmentId || 'DEP-CSE'];
+
+      const switcherBar = document.getElementById('facultyDeptSwitcherBar');
+      const deptSelector = document.getElementById('facultyDeptSelector');
+
+      if (authDeptIds.length > 1) {
+        switcherBar.style.display = 'flex';
+        deptSelector.innerHTML = authDeptIds.map(id => {
+          const d = allDepts.find(item => item.id === id || item.code === id);
+          const label = d ? `${d.name} (${d.code})` : id;
+          return `<option value="${id}">${label}</option>`;
+        }).join('');
+      } else {
+        switcherBar.style.display = 'none';
+      }
+
+      activeDeptId = authDeptIds[0];
+      onFacultyDeptChanged(activeDeptId);
+    }
+
+    function onFacultyDeptChanged(deptId) {
+      activeDeptId = deptId;
+      activeDept = DepartmentsManager.getDepartmentById(deptId) || { id: deptId, code: deptId, name: deptId };
+
+      document.getElementById('facultyDeptScopePill').textContent = activeDept.code || activeDeptId;
+      document.getElementById('facultyGreeting').textContent = `Welcome, ${facultyProfile.name || 'Faculty Member'}`;
+      document.getElementById('facultyMeta').textContent = `${activeDept.name} (${activeDept.code}) • Faculty ID: ${facultyProfile.facultyId || 'GMU-FAC'}`;
+
+      // Default date to today
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('attDateSelect').value = todayStr;
+
+      // Populate classes dropdown for active department
+      populateDepartmentClasses();
+      // Populate subjects dropdown for active department
+      populateDepartmentSubjects();
+
+      loadStudentsForMarking();
+      renderFacultyHistory();
+      renderFacultyRoster();
+    }
+
+    function populateDepartmentClasses() {
+      const classes = DepartmentsManager.getClasses(activeDeptId);
+      const classSelect = document.getElementById('attClassSelect');
+      const histClassFilter = document.getElementById('histClassFilter');
+      const rosterClassFilter = document.getElementById('rosterClassFilter');
+
+      if (classes.length === 0) {
+        const fallbackOpt = `<option value="${activeDept.code}-A">${activeDept.code}-A</option>`;
+        classSelect.innerHTML = fallbackOpt;
+        histClassFilter.innerHTML = `<option value="ALL">All My Classes</option>` + fallbackOpt;
+        rosterClassFilter.innerHTML = fallbackOpt;
+      } else {
+        classSelect.innerHTML = classes.map(c => `<option value="${c.name}">${c.name} (${c.semester || '4th Sem'})</option>`).join('');
+        histClassFilter.innerHTML = `<option value="ALL">All My Classes</option>` + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        rosterClassFilter.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      }
+
+      // If faculty has assigned class in this department, default to it
+      if (facultyProfile.assignedClass && classes.some(c => c.name === facultyProfile.assignedClass)) {
+        classSelect.value = facultyProfile.assignedClass;
+      }
+    }
+
+    function populateDepartmentSubjects() {
+      const subjects = DepartmentsManager.getSubjects(activeDeptId);
+      const subjSelect = document.getElementById('attSubjectSelect');
+      const histSubjFilter = document.getElementById('histSubjectFilter');
+
+      // Filter to subjects assigned to this faculty, or all department subjects if none matched
+      let facSubjects = subjects.filter(s => s.facultyId === facultyProfile.facultyId);
+      if (facSubjects.length === 0) {
+        facSubjects = subjects;
+      }
+
+      if (facSubjects.length === 0) {
+        const fallbackOpt = `<option value="Core Course" data-code="${activeDept.code}401">Core Course (${activeDept.code}401)</option>`;
+        subjSelect.innerHTML = fallbackOpt;
+        histSubjFilter.innerHTML = `<option value="ALL">All Subjects</option>` + fallbackOpt;
+      } else {
+        subjSelect.innerHTML = facSubjects.map(s => `
+          <option value="${s.name}" data-code="${s.code}">${s.name} (${s.code})</option>
+        `).join('');
+        histSubjFilter.innerHTML = `<option value="ALL">All Subjects</option>` + facSubjects.map(s => `
+          <option value="${s.name}">${s.name}</option>
+        `).join('');
+      }
+    }
+
+    // Load students for chosen class section
+    function loadStudentsForMarking() {
+      const selectedClass = document.getElementById('attClassSelect').value;
+      const allStudents = StorageManager.getStudents();
+      const classStudents = allStudents.filter(s => s.classSection === selectedClass);
+
+      document.getElementById('markingCount').textContent = classStudents.length;
+
+      // Check if session exists already
+      const subjectSelect = document.getElementById('attSubjectSelect');
+      const subject = subjectSelect.value;
+      const date = document.getElementById('attDateSelect').value;
+      const existing = AttendanceManager.checkDuplicate(selectedClass, subject, date, activeDeptId);
+
+      const notice = document.getElementById('duplicateSessionNotice');
+      if (existing) {
+        notice.style.display = 'block';
+        currentMarkingState = { ...(existing.records || {}) };
+      } else {
+        notice.style.display = 'none';
+        currentMarkingState = {};
+        // Default everyone to 'Present'
+        classStudents.forEach(s => {
+          currentMarkingState[s.usn] = 'Present';
+        });
+      }
+
+      renderMarkingCards(classStudents);
+      updateMarkingCounters();
+    }
+
+    function checkExistingSessionNotice() {
+      loadStudentsForMarking();
+    }
+
+    function renderMarkingCards(students) {
+      const container = document.getElementById('markingStudentList');
+      if (students.length === 0) {
+        container.innerHTML = `<p style="padding: 20px; color: var(--gmu-text-muted);">No students registered in ${document.getElementById('attClassSelect').value}.</p>`;
+        return;
+      }
+
+      container.innerHTML = students.map(s => {
+        const status = currentMarkingState[s.usn] || 'Present';
+        const isPresent = status === 'Present';
+        const stats = StudentsManager.getStudentAttendanceStats(s.usn);
+
+        return `
+          <div class="attendance-student-card ${isPresent ? 'present-state' : 'absent-state'}" id="card-${s.usn}">
+            <div class="student-card-info">
+              <div class="student-usn">${s.usn}</div>
+              <div class="student-name">${s.name}</div>
+              <div class="student-curr-att">Current: ${stats.percentage}% (${stats.attended}/${stats.totalClasses} classes)</div>
+            </div>
+            <div>
+              <div class="attendance-toggle-switch">
+                <button type="button" class="att-btn ${isPresent ? 'active-p' : ''}" onclick="setStudentStatus('${s.usn}', 'Present')">P</button>
+                <button type="button" class="att-btn ${!isPresent ? 'active-a' : ''}" onclick="setStudentStatus('${s.usn}', 'Absent')">A</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setStudentStatus(usn, status) {
+      currentMarkingState[usn] = status;
+      const card = document.getElementById(`card-${usn}`);
+      if (card) {
+        card.classList.toggle('present-state', status === 'Present');
+        card.classList.toggle('absent-state', status === 'Absent');
+
+        const btns = card.querySelectorAll('.att-btn');
+        btns[0].classList.toggle('active-p', status === 'Present');
+        btns[1].classList.toggle('active-a', status === 'Absent');
+      }
+      updateMarkingCounters();
+    }
+
+    function markAllStatus(status) {
+      Object.keys(currentMarkingState).forEach(usn => {
+        currentMarkingState[usn] = status;
+        const card = document.getElementById(`card-${usn}`);
+        if (card) {
+          card.classList.toggle('present-state', status === 'Present');
+          card.classList.toggle('absent-state', status === 'Absent');
+
+          const btns = card.querySelectorAll('.att-btn');
+          btns[0].classList.toggle('active-p', status === 'Present');
+          btns[1].classList.toggle('active-a', status === 'Absent');
+        }
+      });
+      updateMarkingCounters();
+      showToast(`All students marked as ${status}.`, 'info');
+    }
+
+    function updateMarkingCounters() {
+      const vals = Object.values(currentMarkingState);
+      const presents = vals.filter(v => v === 'Present').length;
+      const absents = vals.filter(v => v === 'Absent').length;
+
+      document.getElementById('summaryPresentCount').textContent = presents;
+      document.getElementById('summaryAbsentCount').textContent = absents;
+    }
+
+    // Submit Attendance
+    function submitAttendanceSession() {
+      const classSection = document.getElementById('attClassSelect').value;
+      const subjectSelect = document.getElementById('attSubjectSelect');
+      const subject = subjectSelect.value;
+      const subjectCode = subjectSelect.options[subjectSelect.selectedIndex]?.getAttribute('data-code') || `${activeDept.code}401`;
+      const date = document.getElementById('attDateSelect').value;
+
+      if (!date) {
+        showToast('Please select a valid date.', 'error');
+        return;
+      }
+
+      if (Object.keys(currentMarkingState).length === 0) {
+        showToast('No students loaded to mark attendance.', 'error');
+        return;
+      }
+
+      // Check if duplicate exists for this department, class, subject, date
+      const existing = AttendanceManager.checkDuplicate(classSection, subject, date, activeDeptId);
+      let overwrite = false;
+
+      if (existing) {
+        const proceed = confirm(`Attendance for ${activeDept.code} - ${classSection} - ${subject} on ${date} already exists.\n\nDo you want to update/overwrite the existing record?`);
+        if (!proceed) return;
+        overwrite = true;
+      }
+
+      const payload = {
+        departmentId: activeDept.id,
+        departmentCode: activeDept.code,
+        classSection,
+        subject,
+        subjectCode,
+        date,
+        facultyId: facultyProfile.facultyId || 'GMU-FAC',
+        facultyName: facultyProfile.name || 'Faculty',
+        records: currentMarkingState
+      };
+
+      const result = AttendanceManager.saveSession(payload, overwrite);
+      if (result.success) {
+        showToast(`Attendance for ${classSection} (${subject}) on ${date} saved successfully!`, 'success');
+        renderFacultyHistory();
+        renderFacultyRoster();
+      } else {
+        showToast(result.message, 'error');
+      }
+    }
+
+    // History Tab
+    function renderFacultyHistory() {
+      const classSection = document.getElementById('histClassFilter').value;
+      const subject = document.getElementById('histSubjectFilter').value;
+      const date = document.getElementById('histDateFilter').value;
+
+      const sessions = AttendanceManager.filterHistory({
+        departmentId: activeDeptId,
+        classSection: classSection,
+        subject: subject,
+        dateFrom: date || null,
+        dateTo: date || null
+      });
+
+      cachedFacultySessions = sessions;
+      const tbody = document.getElementById('facultyHistoryTableBody');
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gmu-text-muted);">No attendance history matches these criteria for ${activeDept.name}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sessions.map((sess, idx) => {
+        const records = sess.records || {};
+        const total = Object.keys(records).length;
+        const presents = Object.values(records).filter(v => v === 'Present').length;
+        const pct = total > 0 ? Math.round((presents / total) * 100) : 0;
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${sess.date}</strong></td>
+            <td><span class="meta-pill" style="color: var(--gmu-primary);">${sess.classSection}</span></td>
+            <td><strong>${sess.subject}</strong> <small style="color: var(--gmu-text-muted);">(${sess.subjectCode})</small></td>
+            <td>${sess.facultyName}</td>
+            <td>
+              <span class="attendance-percentage ${pct >= 75 ? 'safe' : 'risk'}">${presents} / ${total} (${pct}%)</span>
+            </td>
+            <td>
+              <button class="btn btn-outline-primary btn-sm" onclick="viewSessionDetails('${sess.id}')">View</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function viewSessionDetails(sessionId) {
+      const sess = StorageManager.getAttendance().find(s => s.id === sessionId);
+      if (!sess) return;
+
+      document.getElementById('modalSessionTitle').textContent = `${sess.subject} (${sess.subjectCode})`;
+      document.getElementById('modalSessionMeta').innerHTML = `
+        <strong>Dept:</strong> ${sess.departmentCode || activeDept.code} | <strong>Class:</strong> ${sess.classSection} | <strong>Date:</strong> ${sess.date} | <strong>Instructor:</strong> ${sess.facultyName}
+      `;
+
+      const allStudents = StorageManager.getStudents();
+      const studentMap = {};
+      allStudents.forEach(s => { studentMap[s.usn] = s.name; });
+
+      const tbody = document.getElementById('modalSessionTableBody');
+      tbody.innerHTML = Object.keys(sess.records || {}).map(usn => {
+        const st = sess.records[usn];
+        return `
+          <tr>
+            <td><strong style="font-family: monospace;">${usn}</strong></td>
+            <td>${studentMap[usn] || 'Student'}</td>
+            <td>
+              <span class="badge ${st === 'Present' ? 'badge-present' : 'badge-absent'}">${st}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('modalSessionDetails').classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // Roster Tab
+    function renderFacultyRoster() {
+      const selectedClass = document.getElementById('rosterClassFilter').value;
+      const search = document.getElementById('rosterSearch').value;
+      const onlyLow = document.getElementById('rosterOnlyLow').checked;
+
+      const allStudents = StorageManager.getStudents();
+      // Filter by active department
+      const deptStudents = allStudents.filter(s => s.departmentId === activeDeptId || s.departmentCode === activeDept.code);
+
+      const filtered = StudentsManager.filterStudents(deptStudents, {
+        classSection: selectedClass,
+        search: search,
+        onlyLowAttendance: onlyLow
+      });
+
+      const tbody = document.getElementById('facultyRosterTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--gmu-text-muted);">No students found matching your filters for ${activeDept.name}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((s, idx) => {
+        const stats = StudentsManager.getStudentAttendanceStats(s.usn);
+        const isLow = stats.isLowAttendance;
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>
+              <a href="student-dashboard.html?usn=${s.usn}" style="font-family: monospace; font-weight: 800; color: var(--gmu-primary); text-decoration: underline;" title="View Student Dashboard">
+                ${s.usn}
+              </a>
+            </td>
+            <td>
+              <strong>${s.name}</strong>
+              <div style="font-size: 0.78rem; color: var(--gmu-text-muted);">${s.email}</div>
+            </td>
+            <td><span class="meta-pill">${s.classSection}</span></td>
+            <td>${stats.totalClasses}</td>
+            <td>${stats.attended}</td>
+            <td>
+              <span class="attendance-percentage ${isLow ? 'risk' : 'safe'}">${stats.percentage}%</span>
+            </td>
+            <td>
+              ${isLow ? '<span class="badge badge-warning">⚠ Shortage (&lt;75%)</span>' : '<span class="badge badge-safe">✓ Eligible</span>'}
+            </td>
+            <td>
+              <a href="student-dashboard.html?usn=${s.usn}" class="btn btn-outline-primary btn-sm" title="View Dashboard">
+                👁 View
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportFacultyHistoryCSV() {
+      AttendanceManager.exportToCSV(cachedFacultySessions, `GMU_${activeDept.code}_${facultyProfile.facultyId || 'Faculty'}_Attendance.csv`);
+    }
+
+    function printRoster() {
+      window.print();
+    }
+  </script>
+</body>
+</html>

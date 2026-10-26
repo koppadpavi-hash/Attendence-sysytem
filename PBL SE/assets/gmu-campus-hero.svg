@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 750" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Sky & Sun Gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#2D4C68"/>
+      <stop offset="35%" stop-color="#4B7293"/>
+      <stop offset="70%" stop-color="#9CB3C9"/>
+      <stop offset="100%" stop-color="#D7DFE5"/>
+    </linearGradient>
+
+    <!-- Overlay Gradient to ensure high text contrast while showing campus -->
+    <linearGradient id="heroDarkOverlay" x1="0" y1="0" x2="100%" y2="0">
+      <stop offset="0%" stop-color="#120406" stop-opacity="0.94"/>
+      <stop offset="45%" stop-color="#2B0A11" stop-opacity="0.88"/>
+      <stop offset="80%" stop-color="#3B0E16" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#1F050A" stop-opacity="0.88"/>
+    </linearGradient>
+
+    <linearGradient id="buildingFacade" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#FDFBF7"/>
+      <stop offset="70%" stop-color="#EFE8DB"/>
+      <stop offset="100%" stop-color="#DCD0BD"/>
+    </linearGradient>
+
+    <linearGradient id="solarPanel" x1="0" y1="0" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A5F"/>
+      <stop offset="50%" stop-color="#284B75"/>
+      <stop offset="100%" stop-color="#142842"/>
+    </linearGradient>
+
+    <linearGradient id="terracottaPaving" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#9C4431"/>
+      <stop offset="100%" stop-color="#6E2B1D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="1600" height="750" fill="url(#skyGrad)"/>
+
+  <!-- Distant Trees & Horizon -->
+  <path d="M 0 350 Q 200 330 400 345 Q 700 320 1000 340 Q 1300 325 1600 345 L 1600 750 L 0 750 Z" fill="#2D4D32"/>
+
+  <!-- University Campus Architectural Wings -->
+  <!-- Left Wing -->
+  <polygon points="120,240 680,210 680,520 120,540" fill="url(#buildingFacade)"/>
+  <!-- Right Wing -->
+  <polygon points="920,210 1480,240 1480,540 920,520" fill="url(#buildingFacade)"/>
+  <!-- Central Grand Portico / Glass Atrium Tower -->
+  <polygon points="660,140 940,140 950,530 650,530" fill="#E6DAC6" stroke="#CBB9A0" stroke-width="3"/>
+  <rect x="710" y="210" width="180" height="260" fill="#1C3854" rx="10"/>
+
+  <!-- Rooftop Solar Panel Arrays (representing GM University green campus) -->
+  <g fill="url(#solarPanel)" stroke="#112233" stroke-width="1.5">
+    <!-- Left Wing Solar array -->
+    <polygon points="160,200 640,170 650,210 150,240"/>
+    <polygon points="180,160 620,135 630,170 170,195"/>
+    <!-- Right Wing Solar array -->
+    <polygon points="950,170 1440,200 1450,240 960,210"/>
+    <polygon points="970,135 1420,160 1430,195 980,170"/>
+  </g>
+
+  <!-- Grand Classical Pillars & Windows -->
+  <g fill="#4A1E26" opacity="0.85">
+    <!-- Left wing windows rows -->
+    <rect x="200" y="270" width="30" height="50" rx="4"/>
+    <rect x="250" y="270" width="30" height="50" rx="4"/>
+    <rect x="300" y="270" width="30" height="50" rx="4"/>
+    <rect x="350" y="270" width="30" height="50" rx="4"/>
+    <rect x="400" y="270" width="30" height="50" rx="4"/>
+    <rect x="450" y="270" width="30" height="50" rx="4"/>
+    <rect x="500" y="270" width="30" height="50" rx="4"/>
+    <rect x="550" y="270" width="30" height="50" rx="4"/>
+    <rect x="600" y="270" width="30" height="50" rx="4"/>
+
+    <rect x="200" y="350" width="30" height="50" rx="4"/>
+    <rect x="250" y="350" width="30" height="50" rx="4"/>
+    <rect x="300" y="350" width="30" height="50" rx="4"/>
+    <rect x="350" y="350" width="30" height="50" rx="4"/>
+    <rect x="400" y="350" width="30" height="50" rx="4"/>
+    <rect x="450" y="350" width="30" height="50" rx="4"/>
+    <rect x="500" y="350" width="30" height="50" rx="4"/>
+    <rect x="550" y="350" width="30" height="50" rx="4"/>
+    <rect x="600" y="350" width="30" height="50" rx="4"/>
+
+    <!-- Right wing windows rows -->
+    <rect x="970" y="270" width="30" height="50" rx="4"/>
+    <rect x="1020" y="270" width="30" height="50" rx="4"/>
+    <rect x="1070" y="270" width="30" height="50" rx="4"/>
+    <rect x="1120" y="270" width="30" height="50" rx="4"/>
+    <rect x="1170" y="270" width="30" height="50" rx="4"/>
+    <rect x="1220" y="270" width="30" height="50" rx="4"/>
+    <rect x="1270" y="270" width="30" height="50" rx="4"/>
+    <rect x="1320" y="270" width="30" height="50" rx="4"/>
+
+    <rect x="970" y="350" width="30" height="50" rx="4"/>
+    <rect x="1020" y="350" width="30" height="50" rx="4"/>
+    <rect x="1070" y="350" width="30" height="50" rx="4"/>
+    <rect x="1120" y="350" width="30" height="50" rx="4"/>
+    <rect x="1170" y="350" width="30" height="50" rx="4"/>
+    <rect x="1220" y="350" width="30" height="50" rx="4"/>
+    <rect x="1270" y="350" width="30" height="50" rx="4"/>
+    <rect x="1320" y="350" width="30" height="50" rx="4"/>
+  </g>
+
+  <!-- Courtyard & Circular Plaza Fountain -->
+  <polygon points="0,520 1600,520 1600,750 0,750" fill="url(#terracottaPaving)"/>
+  <ellipse cx="800" cy="620" rx="220" ry="85" fill="#EAD9C2" stroke="#5E2215" stroke-width="4"/>
+  <ellipse cx="800" cy="620" rx="170" ry="60" fill="#2D5A7B" stroke="#D3B896" stroke-width="3"/>
+  <circle cx="800" cy="620" r="16" fill="#FCE9B0"/>
+
+  <!-- Manicured Palms & Greenery flanking entrance -->
+  <path d="M 520,530 C 500,480 540,460 520,440" stroke="#4C2817" stroke-width="6"/>
+  <circle cx="520" cy="430" r="32" fill="#2E5A36"/>
+  <path d="M 1080,530 C 1100,480 1060,460 1080,440" stroke="#4C2817" stroke-width="6"/>
+  <circle cx="1080" cy="430" r="32" fill="#2E5A36"/>
+
+  <!-- High-Fidelity Maroon Overlay for Academic Portal Contrast -->
+  <rect x="0" y="0" width="1600" height="750" fill="url(#heroDarkOverlay)"/>
+</svg>

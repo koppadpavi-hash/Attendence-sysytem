@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - GM University Attendance System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/gmu-crest.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Bar (Matching gmu.ac.in screenshot) -->
+  <aside class="top-bar-official" aria-label="Official University Contact & KCET Codes">
+    <div class="container">
+      <div class="top-contact-info">
+        <span><i>📞</i> 8192233344</span>
+        <span class="divider">|</span>
+        <span><i>✉</i> info@gmu.ac.in</span>
+        <span class="divider">|</span>
+        <span><i>📍</i> GMU Campus, Davanagere</span>
+      </div>
+      <div class="top-right-bar">
+        <div class="top-kcet-codes">
+          KCET Codes : B.Tech – E303 &nbsp;|&nbsp; MCA – C568 &nbsp;|&nbsp; MBA – B086
+        </div>
+        <span id="liveClock" style="font-family: monospace; font-weight: 700; color: #20060B;"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="main-header-gmu">
+    <div class="container header-flex-wrapper">
+      <div class="brand-anchor" title="GM University - Innovating Minds">
+        <img src="assets/gmu-official-logo.png" alt="GM University Logo" style="height: 58px; width: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.35rem; font-weight: 900; color: #F8D272; letter-spacing: 1px; line-height: 1.1;">
+            GM UNIVERSITY
+          </div>
+          <div style="font-family: 'Brush Script MT', cursive, Georgia, serif; font-size: 0.9rem; color: #FFFFFF; font-style: italic;">
+            Innovating Minds
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="color: var(--gmu-gold); font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
+          Administrator Console
+        </div>
+        <div style="font-size: 0.75rem; color: #FDF3D5;">
+          Office of Academic Affairs & Dean of FET • Estd. 2023
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar with Tabs -->
+  <nav class="portal-navbar">
+    <div class="container">
+      <button class="mobile-nav-toggle" onclick="toggleNav()">☰</button>
+      <ul class="nav-links" id="adminNavLinks">
+        <li><button type="button" class="nav-tab-btn active" data-tab="tab-overview" onclick="switchTab('tab-overview')"><i>📊</i> Overview & Stats</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-departments" onclick="switchTab('tab-departments')"><i>🏢</i> Departments</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-classes" onclick="switchTab('tab-classes')"><i>🏫</i> Classes</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-subjects" onclick="switchTab('tab-subjects')"><i>📚</i> Courses</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-students" onclick="switchTab('tab-students')"><i>🎓</i> Students</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-faculty" onclick="switchTab('tab-faculty')"><i>👨‍🏫</i> Faculty</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-master-att" onclick="switchTab('tab-master-att')"><i>📋</i> Attendance Master</button></li>
+        <li><button type="button" class="nav-tab-btn" data-tab="tab-system" onclick="switchTab('tab-system')"><i>⚙</i> System Maintenance</button></li>
+      </ul>
+      <div class="user-session-widget" id="user-session-container">
+        <!-- Rendered by auth.js -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Department Switcher Hub (Requirement: Switch university-wide or department-specific dashboard) -->
+      <div class="content-card" style="margin-bottom: 20px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-left: 5px solid var(--gmu-gold);">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <label for="adminGlobalDeptFilter" style="font-weight: 800; color: var(--gmu-primary); display: flex; align-items: center; gap: 6px; font-size: 0.95rem; margin: 0;">
+            <span>🏢</span> Select Department Dashboard:
+          </label>
+          <select id="adminGlobalDeptFilter" class="form-control" style="font-weight: 700; width: auto; min-width: 320px; border: 2px solid var(--gmu-gold);" onchange="onAdminDepartmentChanged(this.value)">
+            <option value="ALL">🏛 All Departments (University-Wide Overview)</option>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="meta-pill" style="background: var(--gmu-primary); color: #fff; font-weight: 700;" id="deptScopeBadgeText">🏛 University-Wide Overview</span>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="switchTab('tab-departments')">Manage Depts</button>
+        </div>
+      </div>
+
+      <!-- Welcome Banner -->
+      <section class="dashboard-banner">
+        <div>
+          <h1 id="adminWelcomeTitle">Academic Control Center</h1>
+          <p id="adminWelcomeSub">University-wide attendance compliance, faculty allocations, and student registers.</p>
+        </div>
+        <div class="dashboard-actions">
+          <button class="btn btn-gold" onclick="openAddStudentModal()"><i>+</i> Add Student</button>
+          <button class="btn btn-gold" onclick="openAddFacultyModal()"><i>+</i> Add Faculty</button>
+          <button class="btn btn-secondary" onclick="exportCurrentView()"><i>📥</i> Export CSV</button>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 1: OVERVIEW & STATS
+           =================================================================== -->
+      <div id="tab-overview" class="tab-pane active">
+        
+        <!-- Stats Cards Grid -->
+        <div class="stats-grid">
+          <div class="stat-card maroon">
+            <div class="stat-icon">🎓</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statTotalStudents">0</div>
+              <div class="stat-label">Total Enrolled Students</div>
+            </div>
+          </div>
+
+          <div class="stat-card gold">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statTotalFaculty">0</div>
+              <div class="stat-label">Active Faculty Members</div>
+            </div>
+          </div>
+
+          <div class="stat-card green">
+            <div class="stat-icon">📈</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statTodayPercentage">0%</div>
+              <div class="stat-label">Today's Avg Attendance</div>
+            </div>
+          </div>
+
+          <div class="stat-card red">
+            <div class="stat-icon">⚠</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statLowAttendanceCount">0</div>
+              <div class="stat-label">Students Below 75%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Low Attendance Critical Alert Box -->
+        <div class="alert-low-attendance" id="overviewLowAttAlert" style="display: none;">
+          <div class="alert-content">
+            <div class="alert-icon">⚠</div>
+            <div>
+              <h4 id="lowAttAlertHeading">Low Attendance Alert (< 75% UGC Rule)</h4>
+              <p id="lowAttAlertDesc">There are students failing the mandatory 75% semester eligibility criteria.</p>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-danger btn-sm" onclick="showOnlyLowAttendanceStudents()">
+              Review Defaulters List
+            </button>
+          </div>
+        </div>
+
+        <!-- Defaulters / Low Attendance Quick Table -->
+        <div class="content-card" id="cardLowAttendance" style="display: none;">
+          <div class="content-card-header" style="background: #FFF1F2; border-bottom: 2px solid #F43F5E;">
+            <h3 style="color: #9F1239;"><i>⚠</i> Critical Defaulters List (Attendance &lt; 75%)</h3>
+            <div>
+              <button class="btn btn-danger btn-sm" onclick="exportLowAttendanceCSV()">Export Defaulters CSV</button>
+            </div>
+          </div>
+          <div class="content-card-body">
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>USN</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Department</th>
+                    <th>Overall %</th>
+                    <th>Attended / Total</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="lowAttendanceTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Summary Cards -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          
+          <!-- Classes & Section Health -->
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3><i>🏫</i> Department Batches & Class Registers</h3>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="switchTab('tab-classes')">Manage All</button>
+            </div>
+            <div class="content-card-body" style="padding: 16px;">
+              <div id="overviewBatchesList" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Guidelines -->
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3><i>📜</i> Academic Compliance Guidelines</h3>
+            </div>
+            <div class="content-card-body" style="font-size: 0.85rem; line-height: 1.6; color: var(--gmu-text-muted);">
+              <p>• <strong>Eligibility for University Exams:</strong> 75% attendance in theory and practicals is compulsory as per VTU/GMU regulations.</p>
+              <p style="margin-top: 8px;">• <strong>Medical Certificates:</strong> Must be presented within 3 working days of absence to the Academic Dean.</p>
+              <p style="margin-top: 8px;">• <strong>Faculty Account Auto-Sync:</strong> Adding a student or faculty automatically seeds their login account with default credentials.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================================
+           TAB: MANAGE DEPARTMENTS (Requirement 1 & 2)
+           =================================================================== -->
+      <div id="tab-departments" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3><i>🏢</i> University Departments Directory</h3>
+              <p style="font-size: 0.8rem; color: var(--gmu-text-muted); margin: 0;">Manage academic engineering departments, HODs, and institutional hierarchy.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddDepartmentModal()">+ Add New Department</button>
+            </div>
+          </div>
+          <div class="content-card-body">
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Code</th>
+                    <th>Department Name</th>
+                    <th>Head of Dept (HOD)</th>
+                    <th>Classes</th>
+                    <th>Courses</th>
+                    <th>Students</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminDepartmentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB: MANAGE CLASSES & SECTIONS (Requirement 1)
+           =================================================================== -->
+      <div id="tab-classes" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3><i>🏫</i> Classes, Batches & Sections Management</h3>
+              <p style="font-size: 0.8rem; color: var(--gmu-text-muted); margin: 0;">Maintain semester classes and sections organized by academic department.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddClassModal()">+ Add Class / Section</button>
+            </div>
+          </div>
+          <div class="content-card-body">
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="filterClassesDept">Filter by Department</label>
+                <select id="filterClassesDept" class="form-control" onchange="renderClassesTable()">
+                  <option value="ALL">All Departments</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Class / Section</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Program</th>
+                    <th>Enrolled Students</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminClassesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB: MANAGE COURSES / SUBJECTS (Requirement 1)
+           =================================================================== -->
+      <div id="tab-subjects" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3><i>📚</i> Course & Subject Curriculum Directory</h3>
+              <p style="font-size: 0.8rem; color: var(--gmu-text-muted); margin: 0;">Allocate courses, subject codes, and faculty instructors per department.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openAddSubjectModal()">+ Add Course / Subject</button>
+            </div>
+          </div>
+          <div class="content-card-body">
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="filterSubjectsDept">Filter by Department</label>
+                <select id="filterSubjectsDept" class="form-control" onchange="renderSubjectsTable()">
+                  <option value="ALL">All Departments</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Course Code</th>
+                    <th>Course / Subject Name</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Allocated Faculty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminSubjectsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 2: MANAGE STUDENTS
+           =================================================================== -->
+      <div id="tab-students" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>🎓</i> Student Enrollment & Attendance Directory</h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()">+ Add New Student</button>
+            </div>
+          </div>
+          <div class="content-card-body">
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="filterStudentSearch">Search Student</label>
+                <input type="text" id="filterStudentSearch" class="form-control" placeholder="Search by name, USN, or class..." oninput="applyStudentFilters()">
+              </div>
+              <div class="filter-group">
+                <label for="filterStudentClass">Class / Section</label>
+                <select id="filterStudentClass" class="form-control" onchange="applyStudentFilters()">
+                  <option value="ALL">All Classes</option>
+                  <option value="CSE-A">CSE-A</option>
+                  <option value="CSE-B">CSE-B</option>
+                  <option value="ISE-A">ISE-A</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filterStudentDept">Department</label>
+                <select id="filterStudentDept" class="form-control" onchange="applyStudentFilters()">
+                  <option value="ALL">All Departments</option>
+                  <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                  <option value="Information Science & Engineering">Information Science & Engineering</option>
+                </select>
+              </div>
+              <div class="filter-group" style="justify-content: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin-bottom: 8px;">
+                  <input type="checkbox" id="filterOnlyLowAtt" onchange="applyStudentFilters()">
+                  <span style="color: var(--gmu-danger); font-weight: 700;">Show Only &lt; 75%</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Student Table -->
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>USN</th>
+                    <th>Student Name & Email</th>
+                    <th>Class</th>
+                    <th>Semester</th>
+                    <th>Overall Attendance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminStudentsTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 3: MANAGE FACULTY
+           =================================================================== -->
+      <div id="tab-faculty" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>👨‍🏫</i> Faculty Directory & Subject Allocations</h3>
+            <button class="btn btn-primary btn-sm" onclick="openAddFacultyModal()">+ Add New Faculty</button>
+          </div>
+          <div class="content-card-body">
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="filterFacultySearch">Search Faculty</label>
+                <input type="text" id="filterFacultySearch" class="form-control" placeholder="Search by name, ID or subject..." oninput="applyFacultyFilters()">
+              </div>
+              <div class="filter-group">
+                <label for="filterFacultyDept">Department</label>
+                <select id="filterFacultyDept" class="form-control" onchange="applyFacultyFilters()">
+                  <option value="ALL">All Departments</option>
+                  <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                  <option value="Information Science & Engineering">Information Science & Engineering</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Faculty Table -->
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Faculty ID</th>
+                    <th>Name & Email</th>
+                    <th>Department</th>
+                    <th>Allocated Subject</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminFacultyTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 4: ATTENDANCE MASTER
+           =================================================================== -->
+      <div id="tab-master-att" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>📋</i> Master Attendance Register</h3>
+            <button class="btn btn-gold btn-sm" onclick="exportMasterCSV()"><i>📥</i> Export Filtered CSV</button>
+          </div>
+          <div class="content-card-body">
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="filterAttClass">Class / Section</label>
+                <select id="filterAttClass" class="form-control" onchange="applyAttendanceFilters()">
+                  <option value="ALL">All Classes</option>
+                  <option value="CSE-A">CSE-A</option>
+                  <option value="CSE-B">CSE-B</option>
+                  <option value="ISE-A">ISE-A</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filterAttSubject">Subject</label>
+                <select id="filterAttSubject" class="form-control" onchange="applyAttendanceFilters()">
+                  <option value="ALL">All Subjects</option>
+                  <option value="Software Engineering">Software Engineering</option>
+                  <option value="Database Management Systems">Database Management Systems</option>
+                  <option value="Operating Systems">Operating Systems</option>
+                  <option value="Design & Analysis of Algorithms">Design & Analysis of Algorithms</option>
+                  <option value="Full Stack Development">Full Stack Development</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filterAttDateFrom">From Date</label>
+                <input type="date" id="filterAttDateFrom" class="form-control" onchange="applyAttendanceFilters()">
+              </div>
+              <div class="filter-group">
+                <label for="filterAttDateTo">To Date</label>
+                <input type="date" id="filterAttDateTo" class="form-control" onchange="applyAttendanceFilters()">
+              </div>
+            </div>
+
+            <!-- Attendance History Table -->
+            <div class="table-responsive">
+              <table class="gmu-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Session ID</th>
+                    <th>Date</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Faculty Instructor</th>
+                    <th>Attendance Ratio</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAttendanceTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 5: SYSTEM MAINTENANCE
+           =================================================================== -->
+      <div id="tab-system" class="tab-pane" style="display: none;">
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i>⚙</i> System Storage & Demonstration Data Controls</h3>
+          </div>
+          <div class="content-card-body">
+            <div style="background: #FDF4E0; border-left: 5px solid var(--gmu-gold); padding: 18px; border-radius: 6px; margin-bottom: 24px;">
+              <h4 style="color: var(--gmu-primary); font-size: 1.05rem; margin-bottom: 6px;">
+                Demonstration Reset & Backup
+              </h4>
+              <p style="font-size: 0.88rem; color: var(--gmu-text-muted); line-height: 1.5;">
+                This web application stores student records, faculty records, and attendance histories in your browser's dedicated <code>localStorage</code> database under separate keys. If you want to reset everything back to the official GM University demo dataset (with 24+ students, 5 faculty, and seeded sessions), click the button below.
+              </p>
+              <div style="margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-danger" onclick="confirmResetData()">
+                  🔄 Reset Everything to Demo Data
+                </button>
+                <button class="btn btn-primary" onclick="exportFullJSONBackup()">
+                  💾 Download Complete JSON Backup
+                </button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-value" id="storageKeyUsersCount">0</div>
+                  <div class="stat-label">gmu_users Records</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-value" id="storageKeyStudentsCount">0</div>
+                  <div class="stat-label">gmu_students Records</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-value" id="storageKeyFacultyCount">0</div>
+                  <div class="stat-label">gmu_faculty Records</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-value" id="storageKeyAttCount">0</div>
+                  <div class="stat-label">gmu_attendance Sessions</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================================================================
+       MODAL 1: ADD STUDENT
+       =================================================================== -->
+  <div class="modal-overlay" id="modalAddStudent">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Enroll New Student</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalAddStudent')">✕</button>
+      </div>
+      <form id="formAddStudent" onsubmit="handleAddStudentSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" id="studName" class="form-control" placeholder="e.g. Ramesh Kumar Patel" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">University Seat Number (USN) <span class="req">*</span></label>
+            <input type="text" id="studUsn" class="form-control" placeholder="e.g. 4GM22CS025" required style="text-transform: uppercase;">
+            <small style="color: var(--gmu-text-muted); font-size: 0.75rem;">Must be unique. Will serve as student's portal login username.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Academic Department <span class="req">*</span></label>
+            <select id="studDept" class="form-control" required onchange="onAddStudentDeptChanged(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Class / Section <span class="req">*</span></label>
+              <select id="studClass" class="form-control" required>
+                <!-- Populated dynamically based on dept -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester <span class="req">*</span></label>
+              <select id="studSem" class="form-control" required>
+                <option value="4th Sem">4th Sem</option>
+                <option value="6th Sem">6th Sem</option>
+                <option value="8th Sem">8th Sem</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="studEmail" class="form-control" placeholder="e.g. student@gmu.ac.in">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" id="studPhone" class="form-control" placeholder="e.g. 9845012345">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddStudent')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Student & Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: ADD FACULTY
+       =================================================================== -->
+  <div class="modal-overlay" id="modalAddFaculty">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Faculty Member</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalAddFaculty')">✕</button>
+      </div>
+      <form id="formAddFaculty" onsubmit="handleAddFacultySubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Faculty Full Name <span class="req">*</span></label>
+            <input type="text" id="facName" class="form-control" placeholder="e.g. Dr. Raghavendra Rao" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Faculty ID <span class="req">*</span></label>
+            <input type="text" id="facId" class="form-control" placeholder="e.g. GMU-FAC-08" required style="text-transform: uppercase;">
+            <small style="color: var(--gmu-text-muted); font-size: 0.75rem;">Unique university employee code.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Department <span class="req">*</span></label>
+            <select id="facDept" class="form-control" required onchange="onAddFacultyDeptChanged(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Authorized Departments (Cross-Department Teaching)</label>
+            <div id="facAuthorizedDeptsContainer" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 12px; background: var(--gmu-bg); border-radius: 6px; border: 1px solid var(--gmu-border);">
+              <!-- Checkboxes populated dynamically -->
+            </div>
+            <small style="font-size: 0.72rem; color: var(--gmu-text-muted);">Faculty will be able to mark attendance and manage records for all checked departments.</small>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Allocated Subject <span class="req">*</span></label>
+              <input type="text" id="facSubj" class="form-control" placeholder="e.g. Cloud Computing" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject Code</label>
+              <input type="text" id="facSubjCode" class="form-control" placeholder="e.g. CS405" style="text-transform: uppercase;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Email Address <span class="req">*</span></label>
+              <input type="email" id="facEmail" class="form-control" placeholder="e.g. raghavendra.rao@gmu.ac.in" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact Phone</label>
+              <input type="tel" id="facPhone" class="form-control" placeholder="+91 9448000000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned Batch</label>
+            <select id="facClass" class="form-control">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddFaculty')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Faculty & Generate Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 3: EDIT FACULTY
+       =================================================================== -->
+  <div class="modal-overlay" id="modalEditFaculty">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Faculty Profile</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalEditFaculty')">✕</button>
+      </div>
+      <form id="formEditFaculty" onsubmit="handleEditFacultySubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="editFacOriginalId">
+          <div class="form-group">
+            <label class="form-label">Faculty ID (Read-only)</label>
+            <input type="text" id="editFacId" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Faculty Full Name <span class="req">*</span></label>
+            <input type="text" id="editFacName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Department <span class="req">*</span></label>
+            <select id="editFacDept" class="form-control" required onchange="onEditFacultyDeptChanged(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Authorized Departments (Cross-Department Teaching)</label>
+            <div id="editFacAuthorizedDeptsContainer" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 12px; background: var(--gmu-bg); border-radius: 6px; border: 1px solid var(--gmu-border);">
+              <!-- Checkboxes populated dynamically -->
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Allocated Subject <span class="req">*</span></label>
+              <input type="text" id="editFacSubj" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject Code</label>
+              <input type="text" id="editFacSubjCode" class="form-control" style="text-transform: uppercase;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Email Address <span class="req">*</span></label>
+              <input type="email" id="editFacEmail" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact Phone</label>
+              <input type="tel" id="editFacPhone" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned Batch</label>
+            <select id="editFacClass" class="form-control">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditFaculty')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 4: ADD DEPARTMENT (Requirement 1 & 2)
+       =================================================================== -->
+  <div class="modal-overlay" id="modalAddDepartment">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create New Academic Department</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalAddDepartment')">✕</button>
+      </div>
+      <form id="formAddDepartment" onsubmit="handleAddDepartmentSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Department Name <span class="req">*</span></label>
+            <input type="text" id="deptNameInput" class="form-control" placeholder="e.g. Artificial Intelligence & Data Science" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Department Code <span class="req">*</span></label>
+              <input type="text" id="deptCodeInput" class="form-control" placeholder="e.g. AIDS" required style="text-transform: uppercase;">
+              <small style="color: var(--gmu-text-muted); font-size: 0.75rem;">Short 2-5 letter code.</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Operational Status</label>
+              <select id="deptStatusInput" class="form-control">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Head of Department (HOD)</label>
+            <input type="text" id="deptHodInput" class="form-control" placeholder="e.g. Dr. K. M. Chandrashekar">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description / Scope</label>
+            <textarea id="deptDescInput" class="form-control" rows="2" placeholder="Academic scope and faculty affiliation..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddDepartment')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Department</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 5: EDIT DEPARTMENT
+       =================================================================== -->
+  <div class="modal-overlay" id="modalEditDepartment">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Department Details</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalEditDepartment')">✕</button>
+      </div>
+      <form id="formEditDepartment" onsubmit="handleEditDepartmentSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="editDeptId">
+          <div class="form-group">
+            <label class="form-label">Department Code (Read-Only)</label>
+            <input type="text" id="editDeptCode" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department Name <span class="req">*</span></label>
+            <input type="text" id="editDeptName" class="form-control" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Head of Department (HOD)</label>
+              <input type="text" id="editDeptHod" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="editDeptStatus" class="form-control">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="editDeptDesc" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditDepartment')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Department</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 6: ADD CLASS / SECTION
+       =================================================================== -->
+  <div class="modal-overlay" id="modalAddClass">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add New Class / Section</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalAddClass')">✕</button>
+      </div>
+      <form id="formAddClass" onsubmit="handleAddClassSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Department <span class="req">*</span></label>
+            <select id="addClassDeptSelect" class="form-control" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Class / Section Name <span class="req">*</span></label>
+              <input type="text" id="addClassNameInput" class="form-control" placeholder="e.g. ECE-B" required style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester</label>
+              <select id="addClassSemSelect" class="form-control">
+                <option value="4th Sem">4th Sem</option>
+                <option value="6th Sem">6th Sem</option>
+                <option value="8th Sem">8th Sem</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Program</label>
+              <select id="addClassProgramSelect" class="form-control">
+                <option value="B.Tech">B.Tech</option>
+                <option value="M.Tech">M.Tech</option>
+                <option value="MCA">MCA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Academic Year</label>
+              <input type="text" id="addClassYearInput" class="form-control" value="2026-2027">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddClass')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Class</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 7: ADD COURSE / SUBJECT
+       =================================================================== -->
+  <div class="modal-overlay" id="modalAddSubject">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Curriculum Course / Subject</h3>
+        <button class="btn-close-modal" onclick="closeModal('modalAddSubject')">✕</button>
+      </div>
+      <form id="formAddSubject" onsubmit="handleAddSubjectSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Department <span class="req">*</span></label>
+            <select id="addSubjDeptSelect" class="form-control" required onchange="onAddSubjDeptChanged(this.value)">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Course Code <span class="req">*</span></label>
+              <input type="text" id="addSubjCodeInput" class="form-control" placeholder="e.g. EC403" required style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester</label>
+              <select id="addSubjSemSelect" class="form-control">
+                <option value="4th Sem">4th Sem</option>
+                <option value="6th Sem">6th Sem</option>
+                <option value="8th Sem">8th Sem</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course / Subject Name <span class="req">*</span></label>
+            <input type="text" id="addSubjNameInput" class="form-control" placeholder="e.g. Microcontrollers & Embedded Systems" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Allocated Faculty Instructor</label>
+            <select id="addSubjFacultySelect" class="form-control">
+              <option value="">-- Unassigned --</option>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddSubject')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Register Course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Official University Footer -->
+  <footer class="main-footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <div>Copyright &copy; 2026 <strong>GM University, Davanagere</strong>. All Rights Reserved.</div>
+        <div>Administrator Portal • Student Attendance Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/departments.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/faculty.js"></script>
+  <script src="js/attendance.js"></script>
+
+  <script>
+    // Route guard
+    let currentUser = null;
+    let currentAdminDept = 'ALL';
+    let cachedFilteredSessions = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      currentUser = Auth.requireAuth(['admin']);
+      if (!currentUser) return;
+
+      populateAdminDeptDropdowns();
+      refreshAllData();
+      startLiveClock();
+    });
+
+    function startLiveClock() {
+      const clock = document.getElementById('liveClock');
+      function update() {
+        if (clock) clock.textContent = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString();
+      }
+      setInterval(update, 1000);
+      update();
+    }
+
+    function toggleNav() {
+      const links = document.getElementById('adminNavLinks');
+      links.classList.toggle('open');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.style.display = 'block';
+
+      const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const links = document.getElementById('adminNavLinks');
+      if (links) links.classList.remove('open');
+
+      if (tabId === 'tab-departments') renderDepartmentsTable();
+      if (tabId === 'tab-classes') renderClassesTable();
+      if (tabId === 'tab-subjects') renderSubjectsTable();
+    }
+
+    // Populate all department dropdowns throughout admin console
+    function populateAdminDeptDropdowns() {
+      const depts = DepartmentsManager.getDepartments();
+
+      // 1. Global Department Switcher
+      const globalSel = document.getElementById('adminGlobalDeptFilter');
+      if (globalSel) {
+        globalSel.innerHTML = `<option value="ALL">🏛 All Departments (University-Wide Aggregate)</option>` +
+          depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+      }
+
+      // 2. Filter dropdowns in tabs
+      const classDeptFilter = document.getElementById('filterClassesDept');
+      if (classDeptFilter) {
+        classDeptFilter.innerHTML = `<option value="ALL">All Departments</option>` +
+          depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+      }
+
+      const subjDeptFilter = document.getElementById('filterSubjectsDept');
+      if (subjDeptFilter) {
+        subjDeptFilter.innerHTML = `<option value="ALL">All Departments</option>` +
+          depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+      }
+
+      const studDeptFilter = document.getElementById('filterStudentDept');
+      if (studDeptFilter) {
+        studDeptFilter.innerHTML = `<option value="ALL">All Departments</option>` +
+          depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+      }
+
+      const facDeptFilter = document.getElementById('filterFacultyDept');
+      if (facDeptFilter) {
+        facDeptFilter.innerHTML = `<option value="ALL">All Departments</option>` +
+          depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+      }
+
+      // 3. Modals dropdowns
+      const studModalDept = document.getElementById('studDept');
+      if (studModalDept) {
+        studModalDept.innerHTML = depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+        if (depts.length > 0) onAddStudentDeptChanged(depts[0].id);
+      }
+
+      const facModalDept = document.getElementById('facDept');
+      if (facModalDept) {
+        facModalDept.innerHTML = depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+        if (depts.length > 0) onAddFacultyDeptChanged(depts[0].id);
+      }
+
+      const editFacDept = document.getElementById('editFacDept');
+      if (editFacDept) {
+        editFacDept.innerHTML = depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+      }
+
+      const addClassDept = document.getElementById('addClassDeptSelect');
+      if (addClassDept) {
+        addClassDept.innerHTML = depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+      }
+
+      const addSubjDept = document.getElementById('addSubjDeptSelect');
+      if (addSubjDept) {
+        addSubjDept.innerHTML = depts.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('');
+        if (depts.length > 0) onAddSubjDeptChanged(depts[0].id);
+      }
+
+      // Populate Authorized Dept Checkboxes for Faculty Modals
+      populateFacultyAuthCheckboxes('facAuthorizedDeptsContainer', 'authDeptAdd');
+      populateFacultyAuthCheckboxes('editFacAuthorizedDeptsContainer', 'authDeptEdit');
+    }
+
+    function populateFacultyAuthCheckboxes(containerId, prefix) {
+      const depts = DepartmentsManager.getDepartments();
+      const cont = document.getElementById(containerId);
+      if (!cont) return;
+
+      cont.innerHTML = depts.map(d => `
+        <label style="display: flex; align-items: center; gap: 5px; font-size: 0.82rem; cursor: pointer;">
+          <input type="checkbox" id="${prefix}_${d.id}" value="${d.id}">
+          <span>${d.code}</span>
+        </label>
+      `).join('');
+    }
+
+    // Global Department Change Handler
+    function onAdminDepartmentChanged(deptId) {
+      currentAdminDept = deptId;
+      const titleEl = document.getElementById('adminWelcomeTitle');
+      const subEl = document.getElementById('adminWelcomeSub');
+      const badgeText = document.getElementById('deptScopeBadgeText');
+
+      if (deptId === 'ALL') {
+        titleEl.textContent = 'Academic Control Center';
+        subEl.textContent = 'University-wide attendance compliance, faculty allocations, and student registers.';
+        badgeText.textContent = '🏛 University-Wide Overview';
+
+        // Reset tab filters
+        const sc = document.getElementById('filterStudentDept');
+        if (sc) sc.value = 'ALL';
+        const fc = document.getElementById('filterFacultyDept');
+        if (fc) fc.value = 'ALL';
+        const cc = document.getElementById('filterClassesDept');
+        if (cc) cc.value = 'ALL';
+        const sb = document.getElementById('filterSubjectsDept');
+        if (sb) sb.value = 'ALL';
+      } else {
+        const dept = DepartmentsManager.getDepartmentById(deptId);
+        if (dept) {
+          titleEl.textContent = `Department of ${dept.name} (${dept.code})`;
+          subEl.textContent = `Head of Department: ${dept.headOfDept} • ${dept.description}`;
+          badgeText.textContent = `🏢 ${dept.code} Scope`;
+
+          const sc = document.getElementById('filterStudentDept');
+          if (sc) sc.value = dept.name;
+          const fc = document.getElementById('filterFacultyDept');
+          if (fc) fc.value = dept.name;
+          const cc = document.getElementById('filterClassesDept');
+          if (cc) cc.value = dept.id;
+          const sb = document.getElementById('filterSubjectsDept');
+          if (sb) sb.value = dept.id;
+        }
+      }
+
+      refreshAllData();
+    }
+
+    // Refresh dashboards and tabs
+    function refreshAllData() {
+      renderMetrics();
+      renderRegisteredBatches();
+      renderDepartmentsTable();
+      renderClassesTable();
+      renderSubjectsTable();
+      applyStudentFilters();
+      applyFacultyFilters();
+      applyAttendanceFilters();
+      renderStorageStats();
+    }
+
+    function renderMetrics() {
+      let metrics;
+      if (currentAdminDept === 'ALL') {
+        metrics = AttendanceManager.getSystemMetrics();
+      } else {
+        metrics = DepartmentsManager.getDepartmentStats(currentAdminDept);
+      }
+
+      document.getElementById('statTotalStudents').textContent = metrics.totalStudents;
+      document.getElementById('statTotalFaculty').textContent = metrics.totalFaculty;
+      document.getElementById('statTodayPercentage').textContent = `${metrics.todayAttendancePercentage}%`;
+      document.getElementById('statLowAttendanceCount').textContent = metrics.lowAttendanceCount;
+
+      const alertEl = document.getElementById('overviewLowAttAlert');
+      const cardLowAtt = document.getElementById('cardLowAttendance');
+      const tbody = document.getElementById('lowAttendanceTableBody');
+
+      if (metrics.lowAttendanceCount > 0) {
+        alertEl.style.display = 'flex';
+        cardLowAtt.style.display = 'block';
+        document.getElementById('lowAttAlertHeading').textContent = `Action Required: ${metrics.lowAttendanceCount} Student(s) with Attendance Below 75%`;
+
+        tbody.innerHTML = metrics.lowAttendanceList.map((item, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>
+              <a href="student-dashboard.html?usn=${item.student.usn}" style="color: var(--gmu-danger); font-family: monospace; font-weight: 800; text-decoration: underline;" title="View Student Dashboard">
+                ${item.student.usn}
+              </a>
+            </td>
+            <td><strong>${item.student.name}</strong><br><small style="color: var(--gmu-text-muted);">${item.student.email}</small></td>
+            <td><span class="meta-pill">${item.student.classSection}</span></td>
+            <td>${item.student.departmentCode || item.student.department}</td>
+            <td><span class="badge badge-warning">${item.stats.percentage}%</span></td>
+            <td>${item.stats.attended} / ${item.stats.totalClasses} classes</td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <a href="student-dashboard.html?usn=${item.student.usn}" class="btn btn-sm btn-outline-primary" title="Open Student Dashboard">👁 View</a>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        alertEl.style.display = 'none';
+        cardLowAtt.style.display = 'none';
+      }
+    }
+
+    function renderRegisteredBatches() {
+      const classes = DepartmentsManager.getClasses(currentAdminDept);
+      const students = StorageManager.getStudents();
+      const listContainer = document.getElementById('overviewBatchesList');
+      if (!listContainer) return;
+
+      if (classes.length === 0) {
+        listContainer.innerHTML = `<p style="color: var(--gmu-text-muted); font-size: 0.85rem;">No registered classes found for this department scope.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = classes.map(c => {
+        const count = students.filter(s => s.classSection === c.name).length;
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gmu-border); padding-bottom: 8px;">
+            <div>
+              <strong>${c.name} (${c.semester || '4th Sem'})</strong>
+              <div style="font-size: 0.78rem; color: var(--gmu-text-muted);">${c.departmentCode} • ${c.courseProgram || 'B.Tech'}</div>
+            </div>
+            <span class="meta-pill" style="font-weight: 700;">${count} Students</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Departments Management Tab
+    function renderDepartmentsTable() {
+      const depts = DepartmentsManager.getDepartments();
+      const students = StorageManager.getStudents();
+      const tbody = document.getElementById('adminDepartmentsTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = depts.map((d, idx) => {
+        const deptClasses = DepartmentsManager.getClasses(d.id);
+        const deptSubjects = DepartmentsManager.getSubjects(d.id);
+        const enrolledCount = students.filter(s => s.departmentId === d.id || s.departmentCode === d.code).length;
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong style="color: var(--gmu-primary);">${d.code}</strong></td>
+            <td>
+              <strong>${d.name}</strong>
+              <div style="font-size: 0.75rem; color: var(--gmu-text-muted);">${d.description || ''}</div>
+            </td>
+            <td>${d.headOfDept || 'TBA'}</td>
+            <td><span class="meta-pill">${deptClasses.length} Classes</span></td>
+            <td><span class="meta-pill">${deptSubjects.length} Courses</span></td>
+            <td><strong>${enrolledCount}</strong></td>
+            <td><span class="badge ${d.status === 'Active' ? 'badge-safe' : 'badge-warning'}">${d.status}</span></td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditDepartmentModal('${d.id}')">Edit</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="handleDeleteDepartment('${d.id}')" title="Safe Delete">✕</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddDepartmentModal() {
+      document.getElementById('formAddDepartment').reset();
+      document.getElementById('modalAddDepartment').classList.add('active');
+    }
+
+    function handleAddDepartmentSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('deptNameInput').value,
+        code: document.getElementById('deptCodeInput').value,
+        status: document.getElementById('deptStatusInput').value,
+        headOfDept: document.getElementById('deptHodInput').value,
+        description: document.getElementById('deptDescInput').value
+      };
+
+      const result = DepartmentsManager.addDepartment(payload);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalAddDepartment');
+      showToast(`Department ${result.department.name} (${result.department.code}) created successfully!`, 'success');
+      populateAdminDeptDropdowns();
+      refreshAllData();
+    }
+
+    function openEditDepartmentModal(id) {
+      const dept = DepartmentsManager.getDepartmentById(id);
+      if (!dept) return;
+
+      document.getElementById('editDeptId').value = dept.id;
+      document.getElementById('editDeptCode').value = dept.code;
+      document.getElementById('editDeptName').value = dept.name;
+      document.getElementById('editDeptHod').value = dept.headOfDept || '';
+      document.getElementById('editDeptStatus').value = dept.status || 'Active';
+      document.getElementById('editDeptDesc').value = dept.description || '';
+
+      document.getElementById('modalEditDepartment').classList.add('active');
+    }
+
+    function handleEditDepartmentSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editDeptId').value;
+      const updated = {
+        name: document.getElementById('editDeptName').value,
+        headOfDept: document.getElementById('editDeptHod').value,
+        status: document.getElementById('editDeptStatus').value,
+        description: document.getElementById('editDeptDesc').value
+      };
+
+      const result = DepartmentsManager.updateDepartment(id, updated);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalEditDepartment');
+      showToast('Department details updated.', 'success');
+      populateAdminDeptDropdowns();
+      refreshAllData();
+    }
+
+    function handleDeleteDepartment(id) {
+      const res = DepartmentsManager.deleteDepartment(id);
+      if (!res.success) {
+        alert(res.message);
+      } else {
+        showToast(res.message, 'success');
+        populateAdminDeptDropdowns();
+        refreshAllData();
+      }
+    }
+
+    // Classes Management Tab
+    function renderClassesTable() {
+      const selectedDept = document.getElementById('filterClassesDept')?.value || 'ALL';
+      const classes = DepartmentsManager.getClasses(selectedDept);
+      const students = StorageManager.getStudents();
+      const tbody = document.getElementById('adminClassesTableBody');
+      if (!tbody) return;
+
+      if (classes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gmu-text-muted);">No classes found for the selected department.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = classes.map((c, idx) => {
+        const enrolled = students.filter(s => s.classSection === c.name).length;
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong style="color: var(--gmu-primary);">${c.name}</strong></td>
+            <td><span class="meta-pill">${c.departmentCode}</span></td>
+            <td>${c.semester}</td>
+            <td>${c.courseProgram}</td>
+            <td><strong>${enrolled}</strong> Students</td>
+            <td>
+              <button type="button" class="btn btn-danger btn-sm" onclick="handleDeleteClass('${c.id}')">✕ Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddClassModal() {
+      document.getElementById('formAddClass').reset();
+      document.getElementById('modalAddClass').classList.add('active');
+    }
+
+    function handleAddClassSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        departmentId: document.getElementById('addClassDeptSelect').value,
+        name: document.getElementById('addClassNameInput').value,
+        semester: document.getElementById('addClassSemSelect').value,
+        courseProgram: document.getElementById('addClassProgramSelect').value,
+        academicYear: document.getElementById('addClassYearInput').value
+      };
+
+      const result = DepartmentsManager.addClass(payload);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalAddClass');
+      showToast(`Class ${result.classItem.name} added successfully!`, 'success');
+      refreshAllData();
+    }
+
+    function handleDeleteClass(id) {
+      const res = DepartmentsManager.deleteClass(id);
+      if (!res.success) {
+        alert(res.message);
+      } else {
+        showToast(res.message, 'success');
+        refreshAllData();
+      }
+    }
+
+    // Subjects Management Tab
+    function renderSubjectsTable() {
+      const selectedDept = document.getElementById('filterSubjectsDept')?.value || 'ALL';
+      const subjects = DepartmentsManager.getSubjects(selectedDept);
+      const tbody = document.getElementById('adminSubjectsTableBody');
+      if (!tbody) return;
+
+      if (subjects.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gmu-text-muted);">No courses found for the selected department.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = subjects.map((s, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><code style="color: var(--gmu-primary); font-weight: 800;">${s.code}</code></td>
+          <td><strong>${s.name}</strong></td>
+          <td><span class="meta-pill">${s.departmentCode}</span></td>
+          <td>${s.semester}</td>
+          <td>${s.facultyName || 'Unassigned'}</td>
+          <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="handleDeleteSubject('${s.id}')">✕ Remove</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAddSubjectModal() {
+      document.getElementById('formAddSubject').reset();
+      const depts = DepartmentsManager.getDepartments();
+      if (depts.length > 0) onAddSubjDeptChanged(depts[0].id);
+      document.getElementById('modalAddSubject').classList.add('active');
+    }
+
+    function onAddSubjDeptChanged(deptId) {
+      const faculty = StorageManager.getFaculty();
+      const deptFaculty = faculty.filter(f => f.departmentId === deptId || (f.authorizedDepartments && f.authorizedDepartments.includes(deptId)));
+      const sel = document.getElementById('addSubjFacultySelect');
+      sel.innerHTML = `<option value="">-- Unassigned --</option>` +
+        deptFaculty.map(f => `<option value="${f.facultyId}">${f.name} (${f.facultyId})</option>`).join('');
+    }
+
+    function handleAddSubjectSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        departmentId: document.getElementById('addSubjDeptSelect').value,
+        code: document.getElementById('addSubjCodeInput').value,
+        name: document.getElementById('addSubjNameInput').value,
+        semester: document.getElementById('addSubjSemSelect').value,
+        facultyId: document.getElementById('addSubjFacultySelect').value
+      };
+
+      const result = DepartmentsManager.addSubject(payload);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalAddSubject');
+      showToast(`Course ${result.subject.name} (${result.subject.code}) registered!`, 'success');
+      refreshAllData();
+    }
+
+    function handleDeleteSubject(id) {
+      const res = DepartmentsManager.deleteSubject(id);
+      if (!res.success) {
+        alert(res.message);
+      } else {
+        showToast(res.message, 'success');
+        refreshAllData();
+      }
+    }
+
+    function showOnlyLowAttendanceStudents() {
+      switchTab('tab-students');
+      document.getElementById('filterOnlyLowAtt').checked = true;
+      applyStudentFilters();
+    }
+
+    // Modal Dynamic Selects
+    function onAddStudentDeptChanged(deptId) {
+      const classes = DepartmentsManager.getClasses(deptId);
+      const sel = document.getElementById('studClass');
+      const dept = DepartmentsManager.getDepartmentById(deptId);
+      const deptCode = dept ? dept.code : 'CSE';
+
+      if (classes.length === 0) {
+        sel.innerHTML = `<option value="${deptCode}-A">${deptCode}-A</option>`;
+      } else {
+        sel.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      }
+    }
+
+    function onAddFacultyDeptChanged(deptId) {
+      const classes = DepartmentsManager.getClasses(deptId);
+      const sel = document.getElementById('facClass');
+      const dept = DepartmentsManager.getDepartmentById(deptId);
+      const deptCode = dept ? dept.code : 'CSE';
+
+      if (classes.length === 0) {
+        sel.innerHTML = `<option value="${deptCode}-A">${deptCode}-A</option>`;
+      } else {
+        sel.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      }
+
+      // Check default authorized department checkbox
+      const chk = document.getElementById(`authDeptAdd_${deptId}`);
+      if (chk) chk.checked = true;
+    }
+
+    function onEditFacultyDeptChanged(deptId) {
+      const classes = DepartmentsManager.getClasses(deptId);
+      const sel = document.getElementById('editFacClass');
+      const dept = DepartmentsManager.getDepartmentById(deptId);
+      const deptCode = dept ? dept.code : 'CSE';
+
+      if (classes.length === 0) {
+        sel.innerHTML = `<option value="${deptCode}-A">${deptCode}-A</option>`;
+      } else {
+        sel.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      }
+    }
+
+    // Filter Students
+    function applyStudentFilters() {
+      const allStudents = StorageManager.getStudents();
+      const search = document.getElementById('filterStudentSearch').value;
+      const classSection = document.getElementById('filterStudentClass').value;
+      const department = document.getElementById('filterStudentDept').value;
+      const onlyLowAttendance = document.getElementById('filterOnlyLowAtt').checked;
+
+      // Filter by global department if active
+      let dataset = allStudents;
+      if (currentAdminDept !== 'ALL') {
+        const d = DepartmentsManager.getDepartmentById(currentAdminDept);
+        if (d) {
+          dataset = dataset.filter(s => s.departmentId === d.id || s.departmentCode === d.code || s.department === d.name);
+        }
+      }
+
+      const filtered = StudentsManager.filterStudents(dataset, {
+        search,
+        classSection,
+        department,
+        onlyLowAttendance
+      });
+
+      const tbody = document.getElementById('adminStudentsTableBody');
+      StudentsManager.renderStudentsTable(tbody, filtered, true);
+    }
+
+    // Filter Faculty
+    function applyFacultyFilters() {
+      const allFaculty = StorageManager.getFaculty();
+      const search = document.getElementById('filterFacultySearch').value;
+      const department = document.getElementById('filterFacultyDept').value;
+
+      let dataset = allFaculty;
+      if (currentAdminDept !== 'ALL') {
+        const d = DepartmentsManager.getDepartmentById(currentAdminDept);
+        if (d) {
+          dataset = dataset.filter(f => f.departmentId === d.id || f.departmentCode === d.code || (f.authorizedDepartments && f.authorizedDepartments.includes(d.id)));
+        }
+      }
+
+      const filtered = FacultyManager.filterFaculty(dataset, { search, department });
+      const tbody = document.getElementById('adminFacultyTableBody');
+      FacultyManager.renderFacultyTable(tbody, filtered);
+    }
+
+    // Filter Attendance Master
+    function applyAttendanceFilters() {
+      const classSection = document.getElementById('filterAttClass').value;
+      const subject = document.getElementById('filterAttSubject').value;
+      const dateFrom = document.getElementById('filterAttDateFrom').value;
+      const dateTo = document.getElementById('filterAttDateTo').value;
+
+      const sessions = AttendanceManager.filterHistory({
+        departmentId: currentAdminDept !== 'ALL' ? currentAdminDept : null,
+        classSection,
+        subject,
+        dateFrom,
+        dateTo
+      });
+
+      cachedFilteredSessions = sessions;
+      const tbody = document.getElementById('adminAttendanceTableBody');
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--gmu-text-muted);">No attendance records found for these filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sessions.map((sess, idx) => {
+        const records = sess.records || {};
+        const total = Object.keys(records).length;
+        const present = Object.values(records).filter(v => v === 'Present').length;
+        const ratioPct = total > 0 ? Math.round((present / total) * 100) : 0;
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><code style="color: var(--gmu-primary);">${sess.id}</code></td>
+            <td>${sess.date}</td>
+            <td><span class="meta-pill" style="color: var(--gmu-primary);">${sess.classSection}</span></td>
+            <td><strong>${sess.subject}</strong> <small style="color: var(--gmu-text-muted);">(${sess.subjectCode})</small></td>
+            <td>${sess.facultyName}</td>
+            <td>
+              <strong>${present} / ${total}</strong> (${ratioPct}%)
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="handleDeleteAttendanceSession('${sess.id}')" title="Delete Session">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Modal Helpers
+    function openAddStudentModal() {
+      document.getElementById('formAddStudent').reset();
+      const depts = DepartmentsManager.getDepartments();
+      if (depts.length > 0) onAddStudentDeptChanged(depts[0].id);
+      document.getElementById('modalAddStudent').classList.add('active');
+    }
+
+    function openAddFacultyModal() {
+      document.getElementById('formAddFaculty').reset();
+      const depts = DepartmentsManager.getDepartments();
+      if (depts.length > 0) onAddFacultyDeptChanged(depts[0].id);
+      document.getElementById('modalAddFaculty').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Handlers
+    function handleAddStudentSubmit(e) {
+      e.preventDefault();
+      const deptId = document.getElementById('studDept').value;
+      const dept = DepartmentsManager.getDepartmentById(deptId) || { id: deptId, code: 'CSE', name: 'Computer Science' };
+
+      const payload = {
+        name: document.getElementById('studName').value,
+        usn: document.getElementById('studUsn').value,
+        departmentId: dept.id,
+        departmentCode: dept.code,
+        department: dept.name,
+        classSection: document.getElementById('studClass').value,
+        semester: document.getElementById('studSem').value,
+        email: document.getElementById('studEmail').value,
+        phone: document.getElementById('studPhone').value
+      };
+
+      const result = StudentsManager.addStudent(payload);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalAddStudent');
+      showToast(`Student ${payload.name} (${payload.usn.toUpperCase()}) enrolled! Account created.`, 'success');
+      refreshAllData();
+    }
+
+    function handleDeleteStudent(usn) {
+      if (StudentsManager.deleteStudent(usn)) {
+        refreshAllData();
+      }
+    }
+
+    function handleAddFacultySubmit(e) {
+      e.preventDefault();
+      const deptId = document.getElementById('facDept').value;
+      const dept = DepartmentsManager.getDepartmentById(deptId) || { id: deptId, code: 'CSE', name: 'Computer Science' };
+
+      // Collect checked authorized departments
+      const depts = DepartmentsManager.getDepartments();
+      const authDepts = [];
+      depts.forEach(d => {
+        const chk = document.getElementById(`authDeptAdd_${d.id}`);
+        if (chk && chk.checked) authDepts.push(d.id);
+      });
+      if (!authDepts.includes(dept.id)) authDepts.push(dept.id);
+
+      const payload = {
+        name: document.getElementById('facName').value,
+        facultyId: document.getElementById('facId').value,
+        departmentId: dept.id,
+        departmentCode: dept.code,
+        department: dept.name,
+        authorizedDepartments: authDepts,
+        subject: document.getElementById('facSubj').value,
+        subjectCode: document.getElementById('facSubjCode').value,
+        email: document.getElementById('facEmail').value,
+        phone: document.getElementById('facPhone').value,
+        assignedClass: document.getElementById('facClass').value
+      };
+
+      const result = FacultyManager.addFaculty(payload);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalAddFaculty');
+      showToast(`Faculty ${payload.name} added! Login created: ${result.username}`, 'success');
+      refreshAllData();
+    }
+
+    function handleEditFaculty(facultyId) {
+      const facultyList = StorageManager.getFaculty();
+      const fac = facultyList.find(f => f.facultyId.toUpperCase() === facultyId.toUpperCase());
+      if (!fac) return;
+
+      document.getElementById('editFacOriginalId').value = fac.facultyId;
+      document.getElementById('editFacId').value = fac.facultyId;
+      document.getElementById('editFacName').value = fac.name;
+      document.getElementById('editFacDept').value = fac.departmentId || fac.department;
+      document.getElementById('editFacSubj').value = fac.subject;
+      document.getElementById('editFacSubjCode').value = fac.subjectCode || '';
+      document.getElementById('editFacEmail').value = fac.email;
+      document.getElementById('editFacPhone').value = fac.phone || '';
+      document.getElementById('editFacClass').value = fac.assignedClass || 'CSE-A';
+
+      // Check authorized departments
+      const authList = fac.authorizedDepartments || [fac.departmentId];
+      const depts = DepartmentsManager.getDepartments();
+      depts.forEach(d => {
+        const chk = document.getElementById(`authDeptEdit_${d.id}`);
+        if (chk) chk.checked = authList.includes(d.id);
+      });
+
+      document.getElementById('modalEditFaculty').classList.add('active');
+    }
+
+    function handleEditFacultySubmit(e) {
+      e.preventDefault();
+      const origId = document.getElementById('editFacOriginalId').value;
+      const deptId = document.getElementById('editFacDept').value;
+      const dept = DepartmentsManager.getDepartmentById(deptId) || { id: deptId, code: 'CSE', name: 'Computer Science' };
+
+      const depts = DepartmentsManager.getDepartments();
+      const authDepts = [];
+      depts.forEach(d => {
+        const chk = document.getElementById(`authDeptEdit_${d.id}`);
+        if (chk && chk.checked) authDepts.push(d.id);
+      });
+      if (!authDepts.includes(dept.id)) authDepts.push(dept.id);
+
+      const updatedData = {
+        facultyId: origId,
+        name: document.getElementById('editFacName').value,
+        departmentId: dept.id,
+        departmentCode: dept.code,
+        department: dept.name,
+        authorizedDepartments: authDepts,
+        subject: document.getElementById('editFacSubj').value,
+        subjectCode: document.getElementById('editFacSubjCode').value,
+        email: document.getElementById('editFacEmail').value,
+        phone: document.getElementById('editFacPhone').value,
+        assignedClass: document.getElementById('editFacClass').value
+      };
+
+      const result = FacultyManager.updateFaculty(origId, updatedData);
+      if (!result.success) {
+        showToast(result.errors.join('<br>'), 'error');
+        return;
+      }
+
+      closeModal('modalEditFaculty');
+      showToast('Faculty profile updated successfully.', 'success');
+      refreshAllData();
+    }
+
+    function handleDeleteFaculty(facultyId) {
+      if (FacultyManager.deleteFaculty(facultyId)) {
+        refreshAllData();
+      }
+    }
+
+    function handleDeleteAttendanceSession(id) {
+      if (AttendanceManager.deleteSession(id)) {
+        refreshAllData();
+      }
+    }
+
+    function exportCurrentView() {
+      const scopeLabel = currentAdminDept === 'ALL' ? 'University' : currentAdminDept;
+      AttendanceManager.exportToCSV(cachedFilteredSessions, `GMU_${scopeLabel}_Master_Attendance.csv`);
+    }
+
+    function exportMasterCSV() {
+      exportCurrentView();
+    }
+
+    function exportLowAttendanceCSV() {
+      let metrics;
+      if (currentAdminDept === 'ALL') {
+        metrics = AttendanceManager.getSystemMetrics();
+      } else {
+        metrics = DepartmentsManager.getDepartmentStats(currentAdminDept);
+      }
+
+      const rows = [
+        ['GM UNIVERSITY (GMU), DAVANAGERE - LOW ATTENDANCE CRITICAL REPORT (<75%)'],
+        ['Department Scope', currentAdminDept === 'ALL' ? 'University-Wide' : currentAdminDept],
+        ['Date Generated', new Date().toLocaleString()],
+        [],
+        ['USN', 'Student Name', 'Class/Section', 'Department', 'Email', 'Phone', 'Attendance %', 'Attended', 'Total Classes', 'Status']
+      ];
+
+      metrics.lowAttendanceList.forEach(item => {
+        rows.push([
+          item.student.usn,
+          `"${item.student.name}"`,
+          item.student.classSection,
+          `"${item.student.departmentCode || item.student.department}"`,
+          item.student.email,
+          item.student.phone,
+          `${item.stats.percentage}%`,
+          item.stats.attended,
+          item.stats.totalClasses,
+          'AT RISK / NOT ELIGIBLE (<75%)'
+        ]);
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.join(',')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `GMU_${currentAdminDept}_Low_Attendance_Defaulters.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Defaulters list exported to CSV.', 'success');
+    }
+
+    function confirmResetData() {
+      if (confirm('Warning: This will reset all students, faculty, departments, classes, and attendance records back to default demo state. Continue?')) {
+        StorageManager.resetToDemoData(true);
+        populateAdminDeptDropdowns();
+        refreshAllData();
+        showToast('System reset to default 5-department demo state.', 'success');
+      }
+    }
+
+    function renderStorageStats() {
+      document.getElementById('storageKeyUsersCount').textContent = StorageManager.getUsers().length;
+      document.getElementById('storageKeyStudentsCount').textContent = StorageManager.getStudents().length;
+      document.getElementById('storageKeyFacultyCount').textContent = StorageManager.getFaculty().length;
+      document.getElementById('storageKeyAttCount').textContent = StorageManager.getAttendance().length;
+    }
+
+    function exportFullJSONBackup() {
+      const backup = {
+        users: StorageManager.getUsers(),
+        departments: StorageManager.getDepartments(),
+        classes: StorageManager.getClasses(),
+        subjects: StorageManager.getSubjects(),
+        students: StorageManager.getStudents(),
+        faculty: StorageManager.getFaculty(),
+        attendance: StorageManager.getAttendance(),
+        exportedAt: new Date().toISOString()
+      };
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backup, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute('href', dataStr);
+      dlAnchor.setAttribute('download', 'gmu_department_attendance_backup.json');
+      dlAnchor.click();
+      showToast('System JSON backup downloaded.', 'info');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Login - GM University Attendance Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/gmu-official-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+
+  <!-- ===================================================================
+       1. OFFICIAL GOLDEN TOP BAR (Matches gmu.ac.in)
+       =================================================================== -->
+  <aside class="top-bar-official" aria-label="Official University Contact & KCET Codes">
+    <div class="container">
+      <div class="top-contact-info">
+        <span><i>📞</i> 8192233344</span>
+        <span class="divider">|</span>
+        <span><i>✉</i> info@gmu.ac.in</span>
+        <span class="divider">|</span>
+        <span><i>📍</i> P.B. Road, Davanagere - 577006</span>
+      </div>
+
+      <div class="top-right-bar">
+        <div class="top-kcet-codes">
+          KCET Codes : B.Tech – E303 &nbsp;|&nbsp; MCA – C568 &nbsp;|&nbsp; MBA – B086
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================================================================
+       2. OFFICIAL GM UNIVERSITY HEADER (No public links to inner pages)
+       =================================================================== -->
+  <header class="main-header-gmu">
+    <div class="container header-flex-wrapper">
+      <div class="brand-anchor" title="GM University - Innovating Minds">
+        <img src="assets/gmu-official-logo.png" alt="GM University Logo" style="height: 60px; width: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.45rem; font-weight: 900; color: #F8D272; letter-spacing: 1.2px; line-height: 1.1;">
+            GM UNIVERSITY
+          </div>
+          <div style="font-family: 'Brush Script MT', cursive, Georgia, serif; font-size: 0.95rem; color: #FFFFFF; font-style: italic;">
+            Innovating Minds
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div class="header-badge-title">Academic Attendance Portal</div>
+        <div class="header-badge-sub">Srishyla Educational Trust (R.) • Estd. 2023</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================
+       3. CLEAN CENTERED LOGIN SCREEN
+       =================================================================== -->
+  <main class="login-page-main">
+    <div class="login-wrapper-centered">
+      
+      <!-- Centered University Login Card -->
+      <div class="centered-login-card">
+        <div class="login-card-head">
+          <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+            <img src="assets/gmu-official-logo.png" alt="GM University Crest" style="width: 72px; height: 72px; border-radius: 10px; border: 2px solid var(--gmu-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+          </div>
+          <h2>Academic Portal Sign-In</h2>
+          <p>Student Attendance Management & Compliance System</p>
+        </div>
+
+        <div class="login-card-content">
+          <!-- Role Selector Tabs -->
+          <label class="form-label" style="margin-bottom: 8px;">Select User Role:</label>
+          <div class="role-tabs">
+            <button type="button" class="role-tab-btn active" data-role="admin" id="tabAdmin" onclick="setRole('admin')">
+              <span style="font-size: 1.3rem;">⚙</span>
+              <span>Administrator</span>
+            </button>
+            <button type="button" class="role-tab-btn" data-role="faculty" id="tabFaculty" onclick="setRole('faculty')">
+              <span style="font-size: 1.3rem;">👨‍🏫</span>
+              <span>Faculty</span>
+            </button>
+            <button type="button" class="role-tab-btn" data-role="student" id="tabStudent" onclick="setRole('student')">
+              <span style="font-size: 1.3rem;">🎓</span>
+              <span>Student</span>
+            </button>
+          </div>
+
+          <!-- Clear Error Alert Box -->
+          <div id="loginError" class="error-alert-box"></div>
+
+          <!-- Login Form -->
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div class="form-group">
+              <label for="usernameInput" class="form-label" id="usernameLabel">
+                Admin Username <span class="req">*</span>
+              </label>
+              <input type="text" id="usernameInput" class="form-control" placeholder="Enter administrator username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+              <label for="passwordInput" class="form-label">
+                Password <span class="req">*</span>
+              </label>
+              <div class="input-password-wrap">
+                <input type="password" id="passwordInput" class="form-control" placeholder="Enter portal password" required autocomplete="current-password">
+                <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility()" title="Show/Hide Password">👁</button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 13px; font-size: 1.02rem; margin-top: 4px;">
+              <i>🔒</i> Sign In to Portal
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Small "Demo Credentials" Box under Login Card for Evaluators -->
+      <div class="demo-credentials-box">
+        <div class="demo-credentials-head">
+          <span><i>⚡</i> Demo Credentials by Department (1-Click Fill)</span>
+          <span style="font-size: 0.72rem; color: var(--gmu-text-muted); font-weight: 700;">Click to Test</span>
+        </div>
+        <div class="demo-credentials-body">
+          <!-- Administrator -->
+          <div class="demo-chip-row">
+            <div class="demo-chip-info">
+              <strong>⚙ Administrator:</strong> <code>admin</code> / <code>admin123</code> <span style="font-size:0.75rem; color:var(--gmu-primary);">(All 5 Departments)</span>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('admin', 'admin', 'admin123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Faculty CSE -->
+          <div class="demo-chip-row">
+            <div class="demo-chip-info">
+              <strong>👨‍🏫 Faculty (CSE):</strong> <code>rajesh.kumar</code> / <code>faculty123</code>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('faculty', 'rajesh.kumar', 'faculty123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Faculty ISE & CSE Multi-Dept -->
+          <div class="demo-chip-row" style="border-left: 3.5px solid var(--gmu-gold);">
+            <div class="demo-chip-info">
+              <strong>👨‍🏫 Faculty (Multi-Dept):</strong> <code>venkatesh.rao</code> / <code>faculty123</code> <span style="font-size:0.75rem; color:#854d0e;">(ISE & CSE)</span>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('faculty', 'venkatesh.rao', 'faculty123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Faculty ECE -->
+          <div class="demo-chip-row">
+            <div class="demo-chip-info">
+              <strong>👨‍🏫 Faculty (ECE):</strong> <code>suresh.babu</code> / <code>faculty123</code>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('faculty', 'suresh.babu', 'faculty123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Student: CSE -->
+          <div class="demo-chip-row">
+            <div class="demo-chip-info">
+              <strong>🎓 Student (CSE):</strong> <code>4GM22CS054</code> / <code>student123</code> <span style="color: var(--gmu-success); font-weight: 700;">(&gt;75%)</span>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('student', '4GM22CS054', 'student123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Student: ECE -->
+          <div class="demo-chip-row">
+            <div class="demo-chip-info">
+              <strong>🎓 Student (ECE):</strong> <code>4GM22EC001</code> / <code>student123</code> <span style="color: var(--gmu-success); font-weight: 700;">(&gt;75%)</span>
+            </div>
+            <button type="button" class="btn-demo-quick" onclick="fillCredentials('student', '4GM22EC001', 'student123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <!-- Student: Defaulter Demo -->
+          <div class="demo-chip-row" style="border-left: 3.5px solid var(--gmu-danger);">
+            <div class="demo-chip-info">
+              <strong>⚠ Defaulter (Alert):</strong> <code>4GM22CS006</code> / <code>student123</code> <span style="color: var(--gmu-danger); font-weight: 700;">(22% Shortage)</span>
+            </div>
+            <button type="button" class="btn-demo-quick" style="background: var(--gmu-danger); color: #FFFFFF;" onclick="fillCredentials('student', '4GM22CS006', 'student123')">
+              Auto Fill
+            </button>
+          </div>
+
+          <div style="margin-top: 10px; text-align: center;">
+            <button type="button" style="background: transparent; border: none; color: var(--gmu-primary); font-size: 0.78rem; font-weight: 700; cursor: pointer; text-decoration: underline;" onclick="resetDemoData()">
+              🔄 Reset Database to Default State
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================================================================
+       4. OFFICIAL GM UNIVERSITY FOOTER
+       =================================================================== -->
+  <footer class="main-footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col">
+          <h4>GM UNIVERSITY</h4>
+          <p>Established under Karnataka State Act No. 19 of 2023. Sponsored by Srishyla Educational Trust (R.), Bheemasamudra, Davanagere.</p>
+          <p><em>"Igniting Innovation, Inspiring Transformation"</em></p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Academic Compliance</h4>
+          <ul class="footer-links">
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Mandatory UGC 75% Minimum Attendance</span></li>
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Real-Time Course Register Updates</span></li>
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Automated Shortage Defaulters Tracking</span></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Constituent Departments</h4>
+          <ul class="footer-links">
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Faculty of Engineering & Technology (FET)</span></li>
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Dept. of Computer Science & Engineering</span></li>
+            <li><span style="font-size: 0.82rem; color: #E5E7EB;">• Dept. of Information Science & Engineering</span></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Campus Contact</h4>
+          <ul class="footer-contact-list">
+            <li>
+              <i>📍</i>
+              <span>GM University Campus, Post Box No. 4, P.B. Road, Davanagere - 577006, Karnataka, India</span>
+            </li>
+            <li>
+              <i>📞</i>
+              <span>Helpline: +91 8192233344 / 45</span>
+            </li>
+            <li>
+              <i>✉</i>
+              <span>info@gmu.ac.in</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div>
+          Copyright &copy; 2026 <strong>GM University, Davanagere</strong>. All Rights Reserved.
+        </div>
+        <div>
+          Student Attendance Management System • Software Engineering PBL
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/departments.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let currentRole = 'admin';
+
+    // Rule 4: If a user is already logged in, send them straight to their own dashboard
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeUser = Auth.getCurrentUser();
+      if (activeUser && activeUser.role) {
+        Auth.redirectByRole(activeUser.role);
+        return;
+      }
+
+      // Check if redirected due to unauthorized access attempt
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('error') === 'unauthorized') {
+        const errEl = document.getElementById('loginError');
+        errEl.textContent = 'Access Restricted: Please sign in with your credentials to access the portal.';
+        errEl.style.display = 'block';
+      }
+
+      setRole('admin');
+    });
+
+    function setRole(role) {
+      currentRole = role;
+      document.querySelectorAll('.role-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab${role.charAt(0).toUpperCase() + role.slice(1)}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const label = document.getElementById('usernameLabel');
+      const input = document.getElementById('usernameInput');
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      if (role === 'admin') {
+        label.innerHTML = 'Admin Username <span class="req">*</span>';
+        input.placeholder = 'e.g. admin';
+        input.value = 'admin';
+        document.getElementById('passwordInput').value = 'admin123';
+      } else if (role === 'faculty') {
+        label.innerHTML = 'Faculty Email Username / ID <span class="req">*</span>';
+        input.placeholder = 'e.g. rajesh.kumar';
+        input.value = 'rajesh.kumar';
+        document.getElementById('passwordInput').value = 'faculty123';
+      } else if (role === 'student') {
+        label.innerHTML = 'Student Roll Number / USN <span class="req">*</span>';
+        input.placeholder = 'e.g. 4GM22CS054';
+        input.value = '4GM22CS054';
+        document.getElementById('passwordInput').value = 'student123';
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('passwordInput');
+      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    }
+
+    function fillCredentials(role, user, pass) {
+      setRole(role);
+      document.getElementById('usernameInput').value = user;
+      document.getElementById('passwordInput').value = pass;
+      showToast(`Filled ${role.toUpperCase()} demo credentials. Click "Sign In to Portal" or press Enter.`, 'info');
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      if (!username || !password) {
+        errEl.textContent = 'Please fill in both username and password fields.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Rule 3: Authenticate and redirect by role
+      const res = Auth.login(username, password, currentRole);
+      if (!res.success) {
+        errEl.textContent = res.message;
+        errEl.style.display = 'block';
+        showToast(res.message, 'error');
+        return;
+      }
+
+      showToast(`Login verified. Redirecting to ${currentRole.toUpperCase()} dashboard...`, 'success');
+      setTimeout(() => {
+        Auth.redirectByRole(res.user.role);
+      }, 350);
+    }
+
+    function resetDemoData() {
+      if (confirm('Reset system data to initial GM University demo state?')) {
+        StorageManager.resetToDemoData(true);
+        setRole('admin');
+      }
+    }
+  </script>
+</body>
+</html>

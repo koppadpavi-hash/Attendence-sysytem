@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Self-Service Portal - GM University</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/gmu-official-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <aside class="top-bar-official" aria-label="Official University Contact & KCET Codes">
+    <div class="container">
+      <div class="top-contact-info">
+        <span><i>📞</i> 8192233344</span>
+        <span class="divider">|</span>
+        <span><i>✉</i> studentwelfare@gmu.ac.in</span>
+        <span class="divider">|</span>
+        <span><i>📍</i> GM University Campus, Davanagere</span>
+      </div>
+      <div class="top-right-bar">
+        <div class="top-kcet-codes">
+          KCET Codes : B.Tech – E303 &nbsp;|&nbsp; MCA – C568 &nbsp;|&nbsp; MBA – B086
+        </div>
+        <span id="liveClock" style="font-family: monospace; font-weight: 700; color: #20060B;"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="main-header-gmu">
+    <div class="container header-flex-wrapper">
+      <div class="brand-anchor" title="GM University - Innovating Minds">
+        <img src="assets/gmu-official-logo.png" alt="GM University Logo" style="height: 58px; width: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.35rem; font-weight: 900; color: #F8D272; letter-spacing: 1px; line-height: 1.1;">
+            GM UNIVERSITY
+          </div>
+          <div style="font-family: 'Brush Script MT', cursive, Georgia, serif; font-size: 0.9rem; color: #FFFFFF; font-style: italic;">
+            Innovating Minds
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="color: var(--gmu-gold); font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
+          Student Self-Service
+        </div>
+        <div style="font-size: 0.75rem; color: #FDF3D5;">
+          Attendance Compliance & Course Status
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="portal-navbar">
+    <div class="container">
+      <ul class="nav-links">
+        <li class="nav-link-item active"><a href="student-dashboard.html"><i>🎓</i> My Attendance Overview</a></li>
+        <li class="nav-link-item"><a href="#subjectBreakdownSection"><i>📚</i> Registered Courses</a></li>
+        <li class="nav-link-item"><a href="#dailySessionLogsSection"><i>📅</i> Lecture Log</a></li>
+      </ul>
+      <div class="user-session-widget" id="user-session-container">
+        <!-- Rendered by auth.js -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Student Profile Card Header -->
+      <section class="student-profile-header">
+        <div class="student-profile-details">
+          <div class="student-avatar" id="studentInitials">ST</div>
+          <div class="student-info-meta">
+            <h2 id="studentFullName">Loading Student Profile...</h2>
+            <div class="student-meta-tags">
+              <span class="meta-pill" id="studentUsnTag">USN: Loading...</span>
+              <span class="meta-pill" id="studentClassTag">Batch: Loading...</span>
+              <span class="meta-pill" id="studentSemTag">Semester: 4th Sem</span>
+              <span class="meta-pill" id="studentDeptTag">Dept: Computer Science</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Switcher for Admin / Faculty -->
+        <div id="adminStudentSwitcherWrap" style="display: none; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(227, 181, 89, 0.4); border-radius: 8px; padding: 10px 14px;">
+          <label style="display: block; font-size: 0.75rem; color: var(--gmu-gold); font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">
+            Viewing Student Profile:
+          </label>
+          <select id="adminStudentSwitcher" class="form-control" style="padding: 6px 10px; font-size: 0.85rem;" onchange="switchViewedStudent(this.value)">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </section>
+
+      <!-- Critical Shortage Alert Box (Only appears if attendance < 75%) -->
+      <div class="alert-low-attendance" id="studentLowAttAlert" style="display: none;">
+        <div class="alert-content">
+          <div class="alert-icon">⚠</div>
+          <div>
+            <h4>Critical Alert: Attendance Shortage (&lt; 75% UGC Criteria)</h4>
+            <p>
+              Your aggregate attendance is currently below the mandatory 75% threshold mandated by GM University regulations. You are at imminent risk of being debarred from Semester-End Examinations (SEE). Please consult your course instructor or academic mentor immediately.
+            </p>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-danger btn-sm" onclick="exportMyReport()">
+            Download Report
+          </button>
+        </div>
+      </div>
+
+      <!-- New Admission Notice (Appears if newly added student with 0 marked classes) -->
+      <div id="newAdmissionBanner" style="display: none; background: #E0F2FE; border-left: 5px solid #0284C7; padding: 16px 20px; border-radius: var(--radius-md); margin-bottom: 24px; color: #0369A1;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.5rem;">🎉</span>
+          <div>
+            <strong style="font-size: 0.98rem; display: block;">Welcome to GM University Attendance Portal!</strong>
+            <span style="font-size: 0.88rem;">You are officially enrolled. Your course allocations are listed below. As course faculty record daily lectures, your attendance status will update here automatically.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Performance Metric Cards -->
+      <div class="stats-grid">
+        
+        <div class="stat-card" id="cardOverallPct">
+          <div class="stat-icon" id="statIconOverall">📊</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statOverallPct">--%</div>
+            <div class="stat-label">Overall Attendance</div>
+          </div>
+        </div>
+
+        <div class="stat-card blue">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statTotalConducted">0</div>
+            <div class="stat-label">Total Classes Conducted</div>
+          </div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-icon">✓</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statTotalAttended">0</div>
+            <div class="stat-label">Classes Attended</div>
+          </div>
+        </div>
+
+        <div class="stat-card red">
+          <div class="stat-icon">✕</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statTotalMissed">0</div>
+            <div class="stat-label">Classes Missed</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Subject-Wise Progress Cards Section -->
+      <section id="subjectBreakdownSection" class="content-card">
+        <div class="content-card-header">
+          <h3><i>📚</i> Registered Courses & Subject-Wise Attendance</h3>
+          <span style="font-size: 0.84rem; color: var(--gmu-text-muted); font-weight: 600;">Minimum Required: 75% in each course</span>
+        </div>
+        <div class="content-card-body">
+          <div class="subjects-grid" id="subjectsGridContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Chronological Daily Lecture History Table -->
+      <section id="dailySessionLogsSection" class="content-card">
+        <div class="content-card-header">
+          <h3><i>📅</i> Chronological Lecture History</h3>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary btn-sm" onclick="window.print()"><i>🖨</i> Print Report</button>
+            <button class="btn btn-gold btn-sm" onclick="exportMyReport()"><i>📥</i> Export CSV</button>
+          </div>
+        </div>
+
+        <div class="content-card-body">
+          <!-- Filter search for student sessions -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label for="filterStudentSubj">Filter Course</label>
+              <select id="filterStudentSubj" class="form-control" onchange="renderSessionLogs()">
+                <option value="ALL">All Registered Courses</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filterStudentStatus">Attendance Status</label>
+              <select id="filterStudentStatus" class="form-control" onchange="renderSessionLogs()">
+                <option value="ALL">All Statuses (Present & Absent)</option>
+                <option value="Present">Present Only</option>
+                <option value="Absent">Absent Only</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="gmu-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Course Name</th>
+                  <th>Course Code</th>
+                  <th>Faculty Instructor</th>
+                  <th>Attendance Status</th>
+                </tr>
+              </thead>
+              <tbody id="studentSessionsTableBody"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Official University Footer -->
+  <footer class="main-footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <div>Copyright &copy; 2026 <strong>GM University, Davanagere</strong>. All Rights Reserved.</div>
+        <div>Student Self-Service Portal • Student Attendance Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/departments.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/attendance.js"></script>
+
+  <script>
+    let activeSessionUser = null;
+    let studentRecord = null;
+    let studentStats = null;
+    let studentSessionsList = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Require auth (students, faculty or admins can view)
+      activeSessionUser = Auth.requireAuth(['student', 'admin', 'faculty']);
+      if (!activeSessionUser) return;
+
+      setupStudentSwitcher();
+      loadStudentData();
+      startLiveClock();
+    });
+
+    function startLiveClock() {
+      const clock = document.getElementById('liveClock');
+      function update() {
+        if (clock) clock.textContent = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString();
+      }
+      setInterval(update, 1000);
+      update();
+    }
+
+    // Allow Admin & Faculty to switch student profile on the fly
+    function setupStudentSwitcher() {
+      if (activeSessionUser.role === 'admin' || activeSessionUser.role === 'faculty') {
+        const wrap = document.getElementById('adminStudentSwitcherWrap');
+        const sel = document.getElementById('adminStudentSwitcher');
+        wrap.style.display = 'block';
+
+        const allStudents = StorageManager.getStudents();
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryUsn = urlParams.get('usn');
+
+        sel.innerHTML = allStudents.map(s => `
+          <option value="${s.usn}" ${(queryUsn && queryUsn.toUpperCase() === s.usn.toUpperCase()) ? 'selected' : ''}>
+            ${s.usn} - ${s.name} (${s.classSection})
+          </option>
+        `).join('');
+      }
+    }
+
+    function switchViewedStudent(newUsn) {
+      window.location.href = `student-dashboard.html?usn=${newUsn}`;
+    }
+
+    function loadStudentData() {
+      const allStudents = StorageManager.getStudents();
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetUsn = urlParams.get('usn') || activeSessionUser.usn || activeSessionUser.username;
+
+      studentRecord = allStudents.find(s => s.usn.toUpperCase() === targetUsn.toUpperCase());
+
+      // If not found in database, build fallback student record
+      if (!studentRecord) {
+        studentRecord = {
+          usn: targetUsn.toUpperCase(),
+          name: activeSessionUser.name || 'Enrolled Student',
+          classSection: activeSessionUser.classSection || 'CSE-A',
+          semester: activeSessionUser.semester || '4th Sem',
+          department: activeSessionUser.department || 'Computer Science & Engineering',
+          email: activeSessionUser.email || `${targetUsn.toLowerCase()}@student.gmu.ac.in`
+        };
+      }
+
+      // Populate Header details
+      document.getElementById('studentFullName').textContent = studentRecord.name;
+      document.getElementById('studentUsnTag').textContent = `USN: ${studentRecord.usn}`;
+      document.getElementById('studentClassTag').textContent = `Class: ${studentRecord.classSection}`;
+      document.getElementById('studentSemTag').textContent = `Semester: ${studentRecord.semester || '4th Sem'}`;
+      const deptDisplay = studentRecord.departmentCode ? `${studentRecord.department} (${studentRecord.departmentCode})` : (studentRecord.department || 'GMU');
+      document.getElementById('studentDeptTag').textContent = `Dept: ${deptDisplay}`;
+
+      const names = studentRecord.name.split(' ');
+      const initials = names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : names[0].substring(0, 2);
+      document.getElementById('studentInitials').textContent = initials.toUpperCase();
+
+      // Calculate Statistics (with auto course mapping for new students)
+      studentStats = StudentsManager.getStudentAttendanceStats(studentRecord.usn);
+
+      // Render Overall Stats
+      const statOverall = document.getElementById('statOverallPct');
+      const cardOverall = document.getElementById('cardOverallPct');
+      const lowAlert = document.getElementById('studentLowAttAlert');
+      const newBanner = document.getElementById('newAdmissionBanner');
+
+      statOverall.textContent = `${studentStats.percentage}%`;
+      document.getElementById('statTotalConducted').textContent = studentStats.totalClasses;
+      document.getElementById('statTotalAttended').textContent = studentStats.attended;
+      document.getElementById('statTotalMissed').textContent = studentStats.missed;
+
+      if (studentStats.isNewAdmission) {
+        cardOverall.className = 'stat-card blue';
+        lowAlert.style.display = 'none';
+        newBanner.style.display = 'block';
+      } else if (studentStats.isLowAttendance) {
+        cardOverall.className = 'stat-card red';
+        lowAlert.style.display = 'flex';
+        newBanner.style.display = 'none';
+      } else {
+        cardOverall.className = 'stat-card green';
+        lowAlert.style.display = 'none';
+        newBanner.style.display = 'none';
+      }
+
+      // Render Subjects Breakdown Cards
+      renderSubjectCards();
+
+      // Collect Session Logs
+      collectSessions();
+      populateSubjectDropdown();
+      renderSessionLogs();
+    }
+
+    function renderSubjectCards() {
+      const container = document.getElementById('subjectsGridContainer');
+      const subjects = Object.values(studentStats.subjectWise || {});
+
+      if (subjects.length === 0) {
+        container.innerHTML = `<p style="padding: 16px; color: var(--gmu-text-muted);">No courses assigned to this student section yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = subjects.map(sub => {
+        const isLow = sub.isLow;
+        const isNew = sub.isNew;
+        const progressClass = isLow ? 'risk' : 'safe';
+        
+        let badge = `<span class="badge badge-safe">✓ Safe (${sub.percentage}%)</span>`;
+        if (isNew) {
+          badge = `<span class="badge" style="background: #E0F2FE; color: #0284C7; border: 1px solid #BAE6FD;">Enrolled (100%)</span>`;
+        } else if (isLow) {
+          badge = `<span class="badge badge-warning">⚠ Shortage (${sub.percentage}%)</span>`;
+        }
+
+        return `
+          <div class="subject-att-card ${isLow ? 'low-att' : 'good-att'}">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+              <span class="subject-code-tag">${sub.subjectCode}</span>
+              ${badge}
+            </div>
+            <div class="subject-name">${sub.subject}</div>
+            <div style="font-size: 0.82rem; color: var(--gmu-text-muted); margin-bottom: 10px;">
+              Instructor: <strong>${sub.facultyName}</strong>
+            </div>
+            <div class="subject-stats-row">
+              <span>Attendance Rate:</span>
+              <strong style="color: ${isLow ? 'var(--gmu-danger)' : 'var(--gmu-success)'}; font-size: 0.96rem;">${sub.percentage}%</strong>
+            </div>
+            <div class="subject-stats-row">
+              <span>Classes Attended:</span>
+              <span><strong>${sub.attended}</strong> / ${sub.total} conducted</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar ${progressClass}" style="width: ${sub.percentage}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function collectSessions() {
+      const allAttendance = StorageManager.getAttendance();
+      studentSessionsList = [];
+
+      allAttendance.forEach(sess => {
+        if (sess.records && sess.records[studentRecord.usn] !== undefined) {
+          studentSessionsList.push({
+            date: sess.date,
+            subject: sess.subject,
+            subjectCode: sess.subjectCode,
+            facultyName: sess.facultyName,
+            status: sess.records[studentRecord.usn]
+          });
+        }
+      });
+
+      // Sort descending by date
+      studentSessionsList.sort((a, b) => (b.date > a.date ? 1 : -1));
+    }
+
+    function populateSubjectDropdown() {
+      const sel = document.getElementById('filterStudentSubj');
+      const uniqueSubjs = Object.keys(studentStats.subjectWise || {});
+      
+      sel.innerHTML = '<option value="ALL">All Registered Courses</option>';
+      uniqueSubjs.forEach(subj => {
+        const opt = document.createElement('option');
+        opt.value = subj;
+        opt.textContent = subj;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderSessionLogs() {
+      const subjFilter = document.getElementById('filterStudentSubj').value;
+      const statusFilter = document.getElementById('filterStudentStatus').value;
+
+      const filtered = studentSessionsList.filter(s => {
+        if (subjFilter !== 'ALL' && s.subject !== subjFilter) return false;
+        if (statusFilter !== 'ALL' && s.status !== statusFilter) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('studentSessionsTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 28px; color: var(--gmu-text-muted);">
+              No past lecture logs found for the selected filter. As faculty record daily lectures, your attendance status will appear here.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((sess, idx) => {
+        const isP = sess.status === 'Present';
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${sess.date}</strong></td>
+            <td><strong>${sess.subject}</strong></td>
+            <td><span class="meta-pill">${sess.subjectCode}</span></td>
+            <td>${sess.facultyName}</td>
+            <td>
+              <span class="badge ${isP ? 'badge-present' : 'badge-absent'}">
+                ${isP ? '✓ Present' : '✕ Absent'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportMyReport() {
+      AttendanceManager.exportStudentCSV(studentRecord, studentStats);
+    }
+  </script>
+</body>
+</html>

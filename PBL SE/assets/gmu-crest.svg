@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="crestGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D076" />
+      <stop offset="50%" stop-color="#E3B559" />
+      <stop offset="100%" stop-color="#C29432" />
+    </linearGradient>
+    <linearGradient id="crestMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5A1722" />
+      <stop offset="100%" stop-color="#360C14" />
+    </linearGradient>
+  </defs>
+  <!-- Shield Outline -->
+  <path d="M 50 4 C 74 4, 94 14, 96 36 C 96 68, 65 92, 50 98 C 35 92, 4 68, 4 36 C 6 14, 26 4, 50 4 Z" 
+        fill="url(#crestMaroon)" stroke="url(#crestGold)" stroke-width="3"/>
+  <path d="M 50 10 C 70 10, 88 18, 90 38 C 90 64, 63 86, 50 92 C 37 86, 10 64, 10 38 C 12 18, 30 10, 50 10 Z" 
+        fill="none" stroke="url(#crestGold)" stroke-width="1.2" stroke-dasharray="2 1"/>
+  <!-- Open Book -->
+  <path d="M 32 68 Q 50 62 50 71 Q 50 62 68 68 L 66 77 Q 50 71 50 79 Q 50 71 34 77 Z" fill="#FFFFFF"/>
+  <path d="M 50 71 L 50 79" stroke="#4A121A" stroke-width="1.2"/>
+  <!-- Banyan / Wing motif -->
+  <path d="M 50 46 Q 38 36 28 40 Q 34 31 45 35 Q 38 24 50 22 Q 62 24 55 35 Q 66 31 72 40 Q 62 36 50 46 Z" fill="url(#crestGold)"/>
+  <!-- Monogram -->
+  <text x="50" y="62" font-family="'Cinzel', 'Georgia', serif" font-weight="900" font-size="15" 
+        fill="#FFFFFF" text-anchor="middle" letter-spacing="1">GMU</text>
+</svg>
